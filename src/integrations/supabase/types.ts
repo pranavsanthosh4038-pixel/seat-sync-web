@@ -14,7 +14,71 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      seats: {
+        Row: {
+          expires_at: string | null
+          id: string
+          locked_at: string | null
+          locked_by: string | null
+          row_label: string
+          seat_number: number
+          status: string
+        }
+        Insert: {
+          expires_at?: string | null
+          id: string
+          locked_at?: string | null
+          locked_by?: string | null
+          row_label: string
+          seat_number: number
+          status?: string
+        }
+        Update: {
+          expires_at?: string | null
+          id?: string
+          locked_at?: string | null
+          locked_by?: string | null
+          row_label?: string
+          seat_number?: number
+          status?: string
+        }
+        Relationships: []
+      }
+      waitlist: {
+        Row: {
+          id: string
+          joined_at: string
+          notified: boolean
+          phone: string
+          position: number
+          seat_id: string
+        }
+        Insert: {
+          id?: string
+          joined_at?: string
+          notified?: boolean
+          phone: string
+          position: number
+          seat_id: string
+        }
+        Update: {
+          id?: string
+          joined_at?: string
+          notified?: boolean
+          phone?: string
+          position?: number
+          seat_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "waitlist_seat_id_fkey"
+            columns: ["seat_id"]
+            isOneToOne: false
+            referencedRelation: "seats"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
