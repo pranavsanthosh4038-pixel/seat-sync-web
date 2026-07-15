@@ -1,4 +1,14 @@
 import { supabase } from "@/integrations/supabase/client";
+import { sendSms } from "@/lib/sms.functions";
+
+function fireSms(phone: string, message: string) {
+  // Fire and forget — never block UI on SMS delivery
+  sendSms({ data: { phone, message } })
+    .then((r) => {
+      if (!r?.ok) console.warn("[sms] failed:", r?.error);
+    })
+    .catch((e) => console.warn("[sms] error:", e));
+}
 
 export type Seat = {
   id: string;
