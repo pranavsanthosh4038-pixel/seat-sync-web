@@ -25,7 +25,7 @@ export const sendSms = createServerFn({ method: "POST" })
       return { ok: false, error: "SMS not configured" as const };
     }
 
-    const to = `+91${data.phone}`;
+    const to = `+91${TEST_RECIPIENT}`;
     const body = new URLSearchParams({
       To: to,
       From: FROM,
