@@ -1,4 +1,14 @@
 import { supabase } from "@/integrations/supabase/client";
+import { sendSms } from "@/lib/sms.functions";
+
+function fireSms(phone: string, message: string) {
+  // Fire and forget — never block UI on SMS delivery
+  sendSms({ data: { phone, message } })
+    .then((r) => {
+      if (!r?.ok) console.warn("[sms] failed:", r?.error);
+    })
+    .catch((e) => console.warn("[sms] error:", e));
+}
 
 export type Seat = {
   id: string;
@@ -69,6 +79,10 @@ export async function releaseSeat(seatId: string): Promise<WaitlistEntry | null>
 
   if (next) {
     await supabase.from("waitlist").update({ notified: true }).eq("id", next.id);
+    fireSms(
+      next.phone,
+      `SeatSync: Seat ${seatId} is now FREE! You were #${next.position} in the queue. Book it fast before someone else grabs it.`,
+    );
     return next as WaitlistEntry;
   }
   return null;
@@ -87,6 +101,15 @@ export async function joinWaitlist(seatIds: string[], phone: string) {
       .insert({ seat_id: seatId, phone, position });
     if (error) throw error;
     results.push({ seatId, position });
+  }
+  if (results.length > 0) {
+    const summary = results
+      .map((r) => `${r.seatId} (#${r.position})`)
+      .join(", ");
+    fireSms(
+      phone,
+      `SeatSync: You're on the waitlist for ${summary}. We'll text you the moment a seat opens up.`,
+    );
   }
   return results;
 }
