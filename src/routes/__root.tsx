@@ -78,20 +78,24 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "SeatSync — Bengaluru Cinema Waitlist" },
+      { title: "SeatSync — Bengaluru Cinema Waitlist Terminal" },
       {
         name: "description",
         content:
-          "SeatSync — join the waitlist for sold-out Bengaluru movie shows. Live seat status, instant notifications when someone cancels.",
+          "Every show is sold out. Join the waitlist for the seat you want and get notified the moment it opens up. Live seat status across Bengaluru cinemas.",
       },
       { name: "author", content: "SeatSync" },
-      { property: "og:title", content: "SeatSync — Bengaluru Cinema Waitlist" },
+      { property: "og:title", content: "SeatSync — Bengaluru Cinema Waitlist Terminal" },
       {
         property: "og:description",
-        content: "Neon-terminal ticket waitlist for a sold-out Bengaluru.",
+        content: "Every show is sold out. Join the waitlist for the seat you want and get notified the moment it opens up. Live seat status across Bengaluru cinemas.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "SeatSync — Bengaluru Cinema Waitlist Terminal" },
+      { name: "twitter:description", content: "Every show is sold out. Join the waitlist for the seat you want and get notified the moment it opens up. Live seat status across Bengaluru cinemas." },
+      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/95ffa3de-d0ed-4812-8201-3ba887a1f413" },
+      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/95ffa3de-d0ed-4812-8201-3ba887a1f413" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },

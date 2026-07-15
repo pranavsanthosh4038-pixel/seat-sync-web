@@ -12,10 +12,10 @@ export const Route = createFileRoute("/")({
         content:
           "Every show is sold out. Join the waitlist for the seat you want and get notified the moment it opens up. Live seat status across Bengaluru cinemas.",
       },
-      { property: "og:title", content: "SeatSync — Bengaluru Cinema Waitlist" },
+      { property: "og:title", content: "SeatSync — Bengaluru Cinema Waitlist Terminal" },
       {
         property: "og:description",
-        content: "Neon-terminal movie ticket waitlist for a sold-out Bengaluru.",
+        content: "Every show is sold out. Join the waitlist for the seat you want and get notified the moment it opens up. Live seat status across Bengaluru cinemas.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
