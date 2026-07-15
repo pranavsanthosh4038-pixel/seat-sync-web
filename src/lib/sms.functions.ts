@@ -6,6 +6,9 @@ const InputSchema = z.object({
   message: z.string().min(1).max(320),
 });
 
+// DEMO: override every outbound SMS to a fixed test recipient.
+const TEST_RECIPIENT = "8590482082";
+
 export const sendSms = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => InputSchema.parse(input))
   .handler(async ({ data }) => {
