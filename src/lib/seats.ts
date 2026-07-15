@@ -79,6 +79,10 @@ export async function releaseSeat(seatId: string): Promise<WaitlistEntry | null>
 
   if (next) {
     await supabase.from("waitlist").update({ notified: true }).eq("id", next.id);
+    fireSms(
+      next.phone,
+      `SeatSync: Seat ${seatId} is now FREE! You were #${next.position} in the queue. Book it fast before someone else grabs it.`,
+    );
     return next as WaitlistEntry;
   }
   return null;
@@ -97,6 +101,15 @@ export async function joinWaitlist(seatIds: string[], phone: string) {
       .insert({ seat_id: seatId, phone, position });
     if (error) throw error;
     results.push({ seatId, position });
+  }
+  if (results.length > 0) {
+    const summary = results
+      .map((r) => `${r.seatId} (#${r.position})`)
+      .join(", ");
+    fireSms(
+      phone,
+      `SeatSync: You're on the waitlist for ${summary}. We'll text you the moment a seat opens up.`,
+    );
   }
   return results;
 }
