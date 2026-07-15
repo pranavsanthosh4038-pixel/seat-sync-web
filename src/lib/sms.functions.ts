@@ -6,6 +6,9 @@ const InputSchema = z.object({
   message: z.string().min(1).max(320),
 });
 
+// DEMO: override every outbound SMS to a fixed test recipient.
+const TEST_RECIPIENT = "8590482082";
+
 export const sendSms = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => InputSchema.parse(input))
   .handler(async ({ data }) => {
@@ -22,7 +25,7 @@ export const sendSms = createServerFn({ method: "POST" })
       return { ok: false, error: "SMS not configured" as const };
     }
 
-    const to = `+91${data.phone}`;
+    const to = `+91${TEST_RECIPIENT}`;
     const body = new URLSearchParams({
       To: to,
       From: FROM,
