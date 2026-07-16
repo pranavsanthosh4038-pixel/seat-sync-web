@@ -30,8 +30,7 @@ async function logActivity(
 async function fireSmsBg(phone: string, message: string) {
   try {
     const { sendSms } = await import("./sms.functions");
-    // sendSms is a serverFn; call directly on the server side.
-    await (sendSms as any).handler?.({ data: { phone, message } });
+    await sendSms({ data: { phone, message } });
   } catch (e) {
     console.warn("[admin sms] fail", e);
   }
