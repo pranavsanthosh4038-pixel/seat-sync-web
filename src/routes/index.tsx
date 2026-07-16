@@ -42,9 +42,17 @@ function MovieBrowser() {
             Bengaluru // Live Ticket Waitlist Terminal
           </div>
         </div>
-        <div className="text-right font-mono text-[11px] uppercase tracking-widest">
-          <div className="text-neon-cyan/80">System</div>
-          <div className="glow-green">ONLINE</div>
+        <div className="text-right font-mono text-[11px] uppercase tracking-widest flex items-center gap-4">
+          <div>
+            <div className="text-neon-cyan/80">System</div>
+            <div className="glow-green">ONLINE</div>
+          </div>
+          <Link
+            to="/admin"
+            className="px-3 py-1.5 border border-neon-amber text-neon-amber hover:bg-neon-amber/10 text-[10px]"
+          >
+            Admin
+          </Link>
         </div>
       </header>
 
