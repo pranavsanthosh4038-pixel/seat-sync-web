@@ -14,6 +14,75 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_activity: {
+        Row: {
+          action: string
+          actor_email: string | null
+          actor_id: string | null
+          created_at: string
+          details: Json
+          id: string
+          seat_id: string | null
+          show_id: string | null
+          target_phone: string | null
+        }
+        Insert: {
+          action: string
+          actor_email?: string | null
+          actor_id?: string | null
+          created_at?: string
+          details?: Json
+          id?: string
+          seat_id?: string | null
+          show_id?: string | null
+          target_phone?: string | null
+        }
+        Update: {
+          action?: string
+          actor_email?: string | null
+          actor_id?: string | null
+          created_at?: string
+          details?: Json
+          id?: string
+          seat_id?: string | null
+          show_id?: string | null
+          target_phone?: string | null
+        }
+        Relationships: []
+      }
+      movies: {
+        Row: {
+          created_at: string
+          duration: string | null
+          genre: string | null
+          language: string | null
+          poster: string | null
+          rating: string | null
+          slug: string
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          duration?: string | null
+          genre?: string | null
+          language?: string | null
+          poster?: string | null
+          rating?: string | null
+          slug: string
+          title: string
+        }
+        Update: {
+          created_at?: string
+          duration?: string | null
+          genre?: string | null
+          language?: string | null
+          poster?: string | null
+          rating?: string | null
+          slug?: string
+          title?: string
+        }
+        Relationships: []
+      }
       seats: {
         Row: {
           expires_at: string | null
@@ -43,6 +112,47 @@ export type Database = {
           status?: string
         }
         Relationships: []
+      }
+      shows: {
+        Row: {
+          created_at: string
+          id: string
+          movie_slug: string
+          screen: string
+          starts_at: string | null
+          status: string
+          theatre: string
+          time: string
+        }
+        Insert: {
+          created_at?: string
+          id: string
+          movie_slug: string
+          screen: string
+          starts_at?: string | null
+          status?: string
+          theatre: string
+          time: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          movie_slug?: string
+          screen?: string
+          starts_at?: string | null
+          status?: string
+          theatre?: string
+          time?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shows_movie_slug_fkey"
+            columns: ["movie_slug"]
+            isOneToOne: false
+            referencedRelation: "movies"
+            referencedColumns: ["slug"]
+          },
+        ]
       }
       waitlist: {
         Row: {
