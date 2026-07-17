@@ -75,7 +75,7 @@ function AuthPage() {
 
   return (
     <div
-      className="min-h-screen flex items-center justify-center px-4"
+      className="admin-scope min-h-screen flex items-center justify-center px-4"
       style={{
         background:
           "radial-gradient(ellipse at top, #eaf2fb 0%, #f4f7fc 45%, #eef3fb 100%)",

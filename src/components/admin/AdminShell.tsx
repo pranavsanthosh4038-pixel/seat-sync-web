@@ -28,7 +28,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
 
   return (
     <div
-      className="min-h-screen"
+      className="admin-scope min-h-screen"
       style={{
         background:
           "radial-gradient(ellipse at top, #eaf2fb 0%, #f4f7fc 45%, #eef3fb 100%)",
