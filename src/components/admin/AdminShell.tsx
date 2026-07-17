@@ -27,12 +27,35 @@ export function AdminShell({ children }: { children: ReactNode }) {
   ] as const;
 
   return (
-    <div className="min-h-screen">
-      <header className="border-b border-neon-cyan/15 px-4 md:px-8 py-4 flex items-center justify-between gap-4 flex-wrap">
+    <div
+      className="min-h-screen"
+      style={{
+        background:
+          "radial-gradient(ellipse at top, #eaf2fb 0%, #f4f7fc 45%, #eef3fb 100%)",
+        color: "#2a3547",
+      }}
+    >
+      <header
+        className="px-4 md:px-8 py-4 flex items-center justify-between gap-4 flex-wrap"
+        style={{
+          background: "rgba(255,255,255,0.7)",
+          backdropFilter: "blur(10px)",
+          borderBottom: "1px solid #e4ecf6",
+        }}
+      >
         <div className="flex items-center gap-6">
-          <Link to="/admin" className="font-display text-lg tracking-[0.3em] glow-cyan">
-            SEAT<span className="text-neon-violet" style={{ textShadow: "0 0 8px #bf00ff" }}>SYNC</span>
-            <span className="ml-2 text-[10px] tracking-widest text-neon-amber align-middle font-mono">ADMIN</span>
+          <Link
+            to="/admin"
+            className="text-lg tracking-[0.25em] font-semibold"
+            style={{ color: "#2a3547", fontFamily: "var(--font-display)" }}
+          >
+            SEAT<span style={{ color: "#8a5cd1" }}>SYNC</span>
+            <span
+              className="ml-2 text-[10px] tracking-widest align-middle font-mono px-1.5 py-0.5 rounded"
+              style={{ background: "#fff2c9", color: "#8a6a10" }}
+            >
+              ADMIN
+            </span>
           </Link>
           <nav className="flex gap-1 font-mono text-[11px] uppercase tracking-widest">
             {NAV.map((item) => {
@@ -43,11 +66,21 @@ export function AdminShell({ children }: { children: ReactNode }) {
                 <Link
                   key={item.to}
                   to={item.to}
-                  className={`px-3 py-1.5 border transition-all ${
+                  className="px-3 py-1.5 transition-all"
+                  style={
                     active
-                      ? "border-neon-cyan text-neon-cyan box-glow-cyan"
-                      : "border-neon-cyan/20 text-muted-foreground hover:text-neon-cyan hover:border-neon-cyan/60"
-                  }`}
+                      ? {
+                          background: "linear-gradient(180deg,#cfe8f7,#87ceeb)",
+                          color: "#0f3d55",
+                          borderRadius: 10,
+                          boxShadow:
+                            "0 6px 14px -6px rgba(90,170,210,0.55), inset 0 1px 0 rgba(255,255,255,0.9)",
+                        }
+                      : {
+                          color: "#6b7a92",
+                          borderRadius: 10,
+                        }
+                  }
                 >
                   {item.label}
                 </Link>
@@ -56,17 +89,23 @@ export function AdminShell({ children }: { children: ReactNode }) {
           </nav>
         </div>
         <div className="flex items-center gap-4">
-          <div className="text-right font-mono text-[10px] uppercase tracking-widest hidden sm:block">
-            <div className="text-neon-cyan/70">System</div>
-            <div className="glow-green">ONLINE</div>
+          <div
+            className="text-right font-mono text-[10px] uppercase tracking-widest hidden sm:block"
+          >
+            <div style={{ color: "#6b7a92" }}>System</div>
+            <div style={{ color: "#2f8a4f" }}>● Online</div>
           </div>
           <div className="text-right font-mono text-[10px]">
-            <div className="text-muted-foreground uppercase tracking-widest">Operator</div>
-            <div className="text-neon-cyan truncate max-w-[160px]">{email ?? "—"}</div>
+            <div className="uppercase tracking-widest" style={{ color: "#6b7a92" }}>
+              Operator
+            </div>
+            <div className="truncate max-w-[160px]" style={{ color: "#2a3547" }}>
+              {email ?? "—"}
+            </div>
           </div>
           <button
             onClick={signOut}
-            className="px-3 py-1.5 border border-destructive/60 text-destructive hover:bg-destructive/10 font-mono text-[10px] uppercase tracking-widest"
+            className="px-3 py-1.5 pastel-btn-pink font-mono text-[10px] uppercase tracking-widest"
           >
             Sign out
           </button>

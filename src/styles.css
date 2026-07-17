@@ -132,6 +132,71 @@
   border-radius: 0.5rem;
 }
 
+/* Pastel neumorphism-lite palette for admin surfaces */
+@utility pastel-surface {
+  background: linear-gradient(180deg, #f7fbff 0%, #eef3fb 100%);
+  color: #2a3547;
+  border-radius: 12px;
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.9) inset,
+    0 -1px 0 rgba(180,195,215,0.35) inset,
+    0 10px 24px -12px rgba(80, 110, 160, 0.25),
+    0 4px 10px -6px rgba(80, 110, 160, 0.18);
+}
+@utility pastel-card {
+  background: #ffffff;
+  color: #2a3547;
+  border-radius: 12px;
+  border: 1px solid #e4ecf6;
+  box-shadow:
+    0 1px 0 rgba(255,255,255,1) inset,
+    0 12px 28px -14px rgba(80, 110, 160, 0.28),
+    0 4px 10px -6px rgba(80, 110, 160, 0.18);
+}
+@utility pastel-inset {
+  background: #eef3fb;
+  border-radius: 10px;
+  box-shadow:
+    inset 2px 2px 5px rgba(163, 177, 198, 0.35),
+    inset -2px -2px 5px rgba(255, 255, 255, 0.9);
+}
+@utility pastel-btn-amber {
+  background: linear-gradient(180deg, #ffe9a8 0%, #f8cf6b 100%);
+  color: #6b4d09;
+  border: 1px solid #e9b94a;
+  border-radius: 10px;
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.9) inset,
+    0 6px 14px -6px rgba(230, 170, 40, 0.55);
+}
+@utility pastel-btn-green {
+  background: linear-gradient(180deg, #c9f2d4 0%, #90ee90 100%);
+  color: #1f5c2e;
+  border: 1px solid #6dcf7a;
+  border-radius: 10px;
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.9) inset,
+    0 6px 14px -6px rgba(80, 190, 110, 0.55);
+}
+@utility pastel-btn-blue {
+  background: linear-gradient(180deg, #cfe8f7 0%, #87ceeb 100%);
+  color: #0f3d55;
+  border: 1px solid #5cb1d6;
+  border-radius: 10px;
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.9) inset,
+    0 6px 14px -6px rgba(90, 170, 210, 0.55);
+}
+@utility pastel-btn-pink {
+  background: linear-gradient(180deg, #ffd6de 0%, #ffb6c1 100%);
+  color: #7a2a3a;
+  border: 1px solid #f18ea0;
+  border-radius: 10px;
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.9) inset,
+    0 6px 14px -6px rgba(240, 130, 155, 0.55);
+}
+
 @keyframes pulse-amber {
   0%, 100% {
     box-shadow: 0 0 6px rgba(255, 204, 0, 0.6), 0 0 12px rgba(255, 204, 0, 0.3);
