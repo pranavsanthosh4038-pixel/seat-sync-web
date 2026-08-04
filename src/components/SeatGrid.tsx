@@ -3,6 +3,16 @@ import { releaseSeat, type Seat } from "@/lib/seats";
 
 const ROWS = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L"];
 
+export const TIERS = [
+  { name: "Recliner", price: 450, rows: ["A", "B", "C", "D"] },
+  { name: "Prime", price: 320, rows: ["E", "F", "G", "H"] },
+  { name: "Classic", price: 220, rows: ["I", "J", "K", "L"] },
+];
+
+export function tierForRow(row: string) {
+  return TIERS.find((t) => t.rows.includes(row)) ?? TIERS[2];
+}
+
 function useTick(ms = 1000) {
   const [, setT] = useState(0);
   useEffect(() => {
@@ -31,7 +41,6 @@ export function SeatGrid({
 }) {
   useTick(1000);
 
-  // Auto-release when countdown hits 0
   const seatMap = new Map(seats.map((s) => [s.id, s]));
   const autoRelease = useCallback(async () => {
     const now = Date.now();
@@ -56,91 +65,70 @@ export function SeatGrid({
   return (
     <div className="w-full flex flex-col items-center">
       {/* Screen */}
-      <div className="w-full max-w-4xl mb-10">
+      <div className="w-full max-w-3xl mb-10">
         <div
-          className="h-2 rounded-full mx-auto"
-          style={{
-            width: "70%",
-            background: "linear-gradient(90deg, transparent, #00f0ff, transparent)",
-            boxShadow: "0 0 24px #00f0ff, 0 0 60px rgba(0,240,255,0.5)",
-          }}
+          className="h-1.5 mx-auto rounded-full bg-border"
+          style={{ width: "72%" }}
         />
-        <div className="text-center mt-3 font-mono text-[10px] tracking-[0.4em] text-neon-cyan/70 uppercase">
-          — Screen This Way —
+        <div className="text-center mt-3 text-xs label-caps text-muted-foreground">
+          Screen this way
         </div>
       </div>
 
-      <div className="flex flex-col gap-2 w-full max-w-5xl">
-        {ROWS.map((row, rowIdx) => {
-          const scale = 1 + rowIdx * 0.012;
-          const rowSeats = Array.from({ length: 16 }, (_, i) => seatMap.get(`${row}${i + 1}`));
-          const block1 = rowSeats.slice(0, 5);
-          const block2 = rowSeats.slice(5, 11);
-          const block3 = rowSeats.slice(11, 16);
-          return (
-            <div
-              key={row}
-              className="flex items-center justify-center gap-6"
-              style={{ transform: `scaleX(${scale})`, transformOrigin: "center" }}
-            >
-              <div className="w-6 text-right font-mono text-[11px] text-neon-cyan/70">{row}</div>
-              <div className="flex gap-1.5">
-                {block1.map((s, i) => (
-                  <SeatCell
-                    key={`${row}-${i}`}
-                    seat={s}
-                    selected={s ? selected.has(s.id) : false}
-                    onToggle={onToggle}
-                  />
-                ))}
-              </div>
-              <div className="flex gap-1.5">
-                {block2.map((s, i) => (
-                  <SeatCell
-                    key={`${row}-${i + 5}`}
-                    seat={s}
-                    selected={s ? selected.has(s.id) : false}
-                    onToggle={onToggle}
-                  />
-                ))}
-              </div>
-              <div className="flex gap-1.5">
-                {block3.map((s, i) => (
-                  <SeatCell
-                    key={`${row}-${i + 11}`}
-                    seat={s}
-                    selected={s ? selected.has(s.id) : false}
-                    onToggle={onToggle}
-                  />
-                ))}
-              </div>
-              <div className="w-6 font-mono text-[11px] text-neon-cyan/70">{row}</div>
+      <div className="flex flex-col gap-5 w-full max-w-4xl">
+        {TIERS.map((tier) => (
+          <div key={tier.name}>
+            <div className="flex items-center gap-3 mb-2 px-1">
+              <span className="text-xs font-semibold text-foreground">{tier.name}</span>
+              <span className="text-xs text-muted-foreground">₹{tier.price}</span>
+              <span className="flex-1 h-px bg-border" />
             </div>
-          );
-        })}
+            <div className="flex flex-col gap-1.5">
+              {tier.rows.map((row) => {
+                const rowSeats = Array.from({ length: 16 }, (_, i) =>
+                  seatMap.get(`${row}${i + 1}`),
+                );
+                return (
+                  <div key={row} className="flex items-center justify-center gap-4">
+                    <div className="w-5 text-right text-[11px] text-muted-foreground">{row}</div>
+                    <div className="flex gap-1.5">
+                      {rowSeats.slice(0, 5).map((s, i) => (
+                        <SeatCell key={i} seat={s} selected={s ? selected.has(s.id) : false} onToggle={onToggle} />
+                      ))}
+                    </div>
+                    <div className="flex gap-1.5">
+                      {rowSeats.slice(5, 11).map((s, i) => (
+                        <SeatCell key={i + 5} seat={s} selected={s ? selected.has(s.id) : false} onToggle={onToggle} />
+                      ))}
+                    </div>
+                    <div className="flex gap-1.5">
+                      {rowSeats.slice(11, 16).map((s, i) => (
+                        <SeatCell key={i + 11} seat={s} selected={s ? selected.has(s.id) : false} onToggle={onToggle} />
+                      ))}
+                    </div>
+                    <div className="w-5 text-[11px] text-muted-foreground">{row}</div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        ))}
       </div>
 
       {/* Legend */}
-      <div className="mt-10 flex flex-wrap gap-6 justify-center font-mono text-[11px] uppercase tracking-widest">
-        <LegendDot color="#00ff88" label="Available" />
-        <LegendDot color="#ffcc00" label="Locked" pulse />
-        <LegendDot color="#00f0ff" label="Selected" />
+      <div className="mt-10 flex flex-wrap gap-5 justify-center text-xs text-muted-foreground">
+        <LegendDot color="var(--seat-available)" label="Available" />
+        <LegendDot color="var(--seat-locked)" label="On hold" />
+        <LegendDot color="var(--seat-selected)" label="Your pick" />
       </div>
     </div>
   );
 }
 
-function LegendDot({ color, label, pulse }: { color: string; label: string; pulse?: boolean }) {
+function LegendDot({ color, label }: { color: string; label: string }) {
   return (
-    <div className="flex items-center gap-2 text-muted-foreground">
-      <span
-        className="inline-block w-3 h-3 rounded-sm"
-        style={{
-          background: color,
-          boxShadow: `0 0 8px ${color}, 0 0 16px ${color}80`,
-          animation: pulse ? "pulse-amber 1.4s ease-in-out infinite" : undefined,
-        }}
-      />
+    <div className="flex items-center gap-2">
+      <span className="inline-block w-3.5 h-3.5 rounded-md" style={{ background: color }} />
       {label}
     </div>
   );
@@ -161,30 +149,23 @@ function SeatCell({
   const countdown = locked ? fmtCountdown(seat.expires_at) : "";
 
   let bg = "transparent";
-  let border = "#00ff88";
-  let shadow = "0 0 6px rgba(0,255,136,0.6), inset 0 0 4px rgba(0,255,136,0.2)";
-  let cursor: "pointer" | "not-allowed" = "pointer";
-  let animation: string | undefined;
+  let border = "var(--seat-available)";
+  let color = "var(--seat-available)";
 
   if (locked) {
-    bg = "rgba(255,204,0,0.15)";
-    border = "#ffcc00";
-    shadow = "0 0 10px rgba(255,204,0,0.7)";
-    cursor = "not-allowed";
-    animation = "pulse-amber 1.4s ease-in-out infinite";
+    bg = "color-mix(in oklab, var(--seat-locked) 16%, transparent)";
+    border = "var(--seat-locked)";
+    color = "var(--seat-locked)";
   } else if (selected) {
-    bg = "rgba(0,240,255,0.25)";
-    border = "#00f0ff";
-    shadow = "0 0 12px #00f0ff, 0 0 24px rgba(0,240,255,0.5), inset 0 0 6px rgba(0,240,255,0.4)";
+    bg = "var(--seat-selected)";
+    border = "var(--seat-selected)";
+    color = "#fff";
   }
 
   return (
     <div className="relative w-7 h-7 flex items-center justify-center">
       {locked && (
-        <div
-          className="absolute -top-4 left-1/2 -translate-x-1/2 font-mono text-[9px] glow-amber whitespace-nowrap pointer-events-none"
-          style={{ letterSpacing: "0.05em" }}
-        >
+        <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 text-[9px] font-semibold text-[color:var(--seat-locked)] whitespace-nowrap pointer-events-none">
           {countdown}
         </div>
       )}
@@ -192,14 +173,12 @@ function SeatCell({
         onClick={() => !locked && onToggle(seat.id)}
         disabled={locked}
         aria-label={`Seat ${seat.id}`}
-        className="w-6 h-6 rounded-[3px] font-mono text-[8px] transition-all"
+        className="w-6 h-6 rounded-lg text-[9px] font-semibold transition-all hover:scale-110 disabled:hover:scale-100"
         style={{
           background: bg,
-          border: `1px solid ${border}`,
-          boxShadow: shadow,
-          cursor,
-          color: selected ? "#00f0ff" : locked ? "#ffcc00" : "#00ff88",
-          animation,
+          border: `1.5px solid ${border}`,
+          color,
+          cursor: locked ? "not-allowed" : "pointer",
         }}
       >
         {seat.seat_number}
