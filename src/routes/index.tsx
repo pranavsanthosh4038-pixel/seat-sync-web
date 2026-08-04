@@ -1,21 +1,24 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 import { MOVIES } from "@/lib/movies";
 import { getTotalWaitlistCount } from "@/lib/seats";
+import { SiteHeader } from "@/components/SiteHeader";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "SeatSync — Bengaluru Cinema Waitlist Terminal" },
+      { title: "SeatSync — Bengaluru Movie Waitlists, Sold-Out Shows" },
       {
         name: "description",
         content:
-          "Every show is sold out. Join the waitlist for the seat you want and get notified the moment it opens up. Live seat status across Bengaluru cinemas.",
+          "Every show is sold out. Join the waitlist for the exact seat you want in Bengaluru cinemas and get an SMS the moment it opens up.",
       },
-      { property: "og:title", content: "SeatSync — Bengaluru Cinema Waitlist Terminal" },
+      { property: "og:title", content: "SeatSync — Bengaluru Movie Waitlists" },
       {
         property: "og:description",
-        content: "Every show is sold out. Join the waitlist for the seat you want and get notified the moment it opens up. Live seat status across Bengaluru cinemas.",
+        content:
+          "Join the waitlist for sold-out shows across Bengaluru cinemas and get notified the second a seat frees up.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -24,7 +27,10 @@ export const Route = createFileRoute("/")({
   component: MovieBrowser,
 });
 
+const CATEGORIES = ["Movies", "Events", "Plays", "Sports", "Comedy"];
+
 function MovieBrowser() {
+  const [category, setCategory] = useState("Movies");
   const { data: waitTotal = 0 } = useQuery({
     queryKey: ["waitlist-total"],
     queryFn: getTotalWaitlistCount,
@@ -32,114 +38,121 @@ function MovieBrowser() {
   });
 
   return (
-    <div className="min-h-screen text-foreground">
-      <header className="border-b border-neon-cyan/15 px-6 md:px-12 py-6 flex items-center justify-between">
-        <div>
-          <h1 className="font-display text-2xl md:text-3xl tracking-[0.3em] glow-cyan">
-            SEAT<span className="text-neon-violet" style={{ textShadow: "0 0 10px #bf00ff" }}>SYNC</span>
+    <div className="min-h-screen bg-background text-foreground">
+      <SiteHeader />
+
+      <main className="max-w-7xl mx-auto px-4 md:px-8">
+        {/* Hero */}
+        <section className="pt-12 pb-8">
+          <p className="label-caps text-xs text-primary mb-3">Bengaluru · Tonight</p>
+          <h1 className="text-4xl md:text-5xl font-bold leading-tight max-w-2xl">
+            What&apos;s showing tonight
           </h1>
-          <div className="font-mono text-[10px] tracking-widest text-muted-foreground uppercase mt-1">
-            Bengaluru // Live Ticket Waitlist Terminal
+          <p className="mt-3 text-muted-foreground text-base max-w-xl">
+            Every show below is sold out. Pick a showtime, tap the seat you want, and join the
+            queue — we&apos;ll text you the moment it frees up.
+          </p>
+          <div className="mt-5 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-surface border border-border text-sm">
+            <span className="w-2 h-2 rounded-full bg-[#2ecc71]" />
+            <span className="text-muted-foreground">People in queue right now</span>
+            <span className="font-bold text-foreground">{waitTotal}</span>
           </div>
-        </div>
-        <div className="text-right font-mono text-[11px] uppercase tracking-widest flex items-center gap-4">
-          <div>
-            <div className="text-neon-cyan/80">System</div>
-            <div className="glow-green">ONLINE</div>
-          </div>
-          <Link
-            to="/admin"
-            className="px-3 py-1.5 border border-neon-amber text-neon-amber hover:bg-neon-amber/10 text-[10px]"
-          >
-            Admin
-          </Link>
-        </div>
-      </header>
+        </section>
 
-      <section className="px-6 md:px-12 py-10">
-        <div className="flex items-end justify-between mb-8 flex-wrap gap-4">
-          <div>
-            <div className="font-mono text-xs uppercase tracking-widest text-neon-cyan/70">
-              Now Showing
-            </div>
-            <h2 className="font-display text-3xl md:text-4xl mt-1 glow-cyan">
-              SOLD OUT IN BENGALURU
-            </h2>
-            <p className="text-muted-foreground font-mono text-sm mt-2 max-w-xl">
-              Every seat is booked. Pick a showtime, tap the seat you want, and join the queue.
-              When someone cancels, the first person in line gets in.
-            </p>
-          </div>
-          <div className="panel px-4 py-3 font-mono text-xs">
-            <span className="text-muted-foreground uppercase tracking-widest">Global Queue </span>
-            <span className="glow-cyan">{waitTotal}</span>
-          </div>
+        {/* Category pills */}
+        <div className="flex gap-2 overflow-x-auto pb-6 -mx-1 px-1">
+          {CATEGORIES.map((c) => {
+            const active = c === category;
+            return (
+              <button
+                key={c}
+                onClick={() => setCategory(c)}
+                className={`shrink-0 px-5 py-2 rounded-full text-sm font-medium border transition-colors ${
+                  active
+                    ? "bg-primary text-primary-foreground border-primary"
+                    : "bg-surface text-muted-foreground border-border hover:text-foreground"
+                }`}
+              >
+                {c}
+              </button>
+            );
+          })}
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        {/* Grid */}
+        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 pb-16">
           {MOVIES.map((m, idx) => (
             <MovieCard key={m.slug} movie={m} waitBase={idx * 3 + 7} />
           ))}
-        </div>
-      </section>
+        </section>
+      </main>
 
-      <footer className="border-t border-neon-cyan/15 mt-8 px-6 md:px-12 py-6 font-mono text-[10px] tracking-widest text-muted-foreground uppercase">
-        SeatSync // Demo Build // Simulated Cancellation & Load Management
+      <footer className="border-t border-border">
+        <div className="max-w-7xl mx-auto px-4 md:px-8 py-8 text-sm text-muted-foreground">
+          SeatSync · Bengaluru · Smart cancellation & waitlist management
+        </div>
       </footer>
     </div>
   );
 }
 
 function MovieCard({ movie, waitBase }: { movie: (typeof MOVIES)[number]; waitBase: number }) {
+  const [open, setOpen] = useState(false);
+  const shown = open ? movie.showtimes : movie.showtimes.slice(0, 2);
+
   return (
-    <div className="panel overflow-hidden transition-all hover:box-glow-cyan group">
-      <div
-        className="h-40 relative"
-        style={{ background: movie.poster }}
-      >
-        <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, transparent 40%, #0d0d0d 100%)" }} />
-        <div className="absolute top-2 right-2 font-mono text-[10px] tracking-widest bg-black/70 border border-neon-cyan/40 px-2 py-0.5 text-neon-cyan">
+    <article className="card-soft card-lift overflow-hidden">
+      <div className="h-44 relative" style={{ background: movie.poster }}>
+        <div
+          className="absolute inset-0"
+          style={{ background: "linear-gradient(180deg, rgba(0,0,0,0.05) 30%, rgba(0,0,0,0.65) 100%)" }}
+        />
+        <span className="absolute top-3 right-3 px-2.5 py-1 rounded-full bg-white/90 text-[#1c1c1c] text-[11px] font-semibold">
           {movie.rating}
-        </div>
-        <div className="absolute bottom-2 left-3 right-3">
-          <h3 className="font-display text-lg tracking-widest glow-cyan">{movie.title}</h3>
-        </div>
+        </span>
+        <h3 className="absolute bottom-3 left-4 right-4 text-xl font-bold text-white">
+          {movie.title}
+        </h3>
       </div>
+
       <div className="p-4">
-        <div className="flex justify-between font-mono text-[10px] uppercase tracking-widest text-muted-foreground mb-3">
-          <span>{movie.genre}</span>
-          <span>{movie.duration}</span>
+        <div className="flex items-center justify-between text-sm">
+          <span className="text-muted-foreground">{movie.genre}</span>
+          <span className="text-muted-foreground">{movie.duration}</span>
         </div>
-        <div className="font-mono text-[10px] text-neon-violet/80 mb-3 uppercase tracking-widest">
-          {movie.language}
-        </div>
-        <div className="space-y-2">
-          {movie.showtimes.map((st, i) => {
+        <p className="mt-1 text-xs text-muted-foreground">{movie.language}</p>
+
+        <div className="mt-4 space-y-2">
+          {shown.map((st, i) => {
             const waiting = waitBase + i * 2;
             return (
               <Link
                 key={st.id}
                 to="/show/$showId"
                 params={{ showId: st.id }}
-                className="flex items-center justify-between px-3 py-2 border border-neon-cyan/20 hover:border-neon-cyan hover:box-glow-cyan transition-all font-mono text-xs"
+                className="flex items-center justify-between gap-3 px-3 py-2.5 rounded-xl bg-surface border border-border hover:border-primary transition-colors"
               >
-                <div>
-                  <div className="text-neon-cyan">{st.time}</div>
-                  <div className="text-[9px] text-muted-foreground uppercase tracking-widest">
-                    {st.theatre}
-                  </div>
+                <div className="min-w-0">
+                  <div className="text-sm font-semibold">{st.time}</div>
+                  <div className="text-xs text-muted-foreground truncate">{st.theatre}</div>
                 </div>
-                <div className="text-right">
-                  <div className="text-neon-amber text-[10px] uppercase tracking-widest">
-                    Sold Out
-                  </div>
-                  <div className="text-[9px] text-muted-foreground">{waiting} waiting</div>
-                </div>
+                <span className="shrink-0 px-3 py-1 rounded-full bg-primary/10 text-primary text-[11px] font-semibold">
+                  {waiting} waiting
+                </span>
               </Link>
             );
           })}
         </div>
+
+        {movie.showtimes.length > 2 && (
+          <button
+            onClick={() => setOpen((v) => !v)}
+            className="mt-3 text-sm font-semibold text-primary"
+          >
+            {open ? "Show less" : `+${movie.showtimes.length - 2} more showtimes`}
+          </button>
+        )}
       </div>
-    </div>
+    </article>
   );
 }
