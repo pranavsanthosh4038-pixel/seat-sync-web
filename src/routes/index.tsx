@@ -1,24 +1,31 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { MOVIES } from "@/lib/movies";
+import {
+  cityByKey,
+  languagesFor,
+  moviesForCity,
+  showtimesFor,
+  type CityKey,
+  type Movie,
+} from "@/lib/movies";
 import { getTotalWaitlistCount } from "@/lib/seats";
 import { SiteHeader } from "@/components/SiteHeader";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "SeatSync — Bengaluru Movie Waitlists, Sold-Out Shows" },
+      { title: "SeatSync — Movie Waitlists for Sold-Out Shows in India" },
       {
         name: "description",
         content:
-          "Every show is sold out. Join the waitlist for the exact seat you want in Bengaluru cinemas and get an SMS the moment it opens up.",
+          "Every show is sold out. Join the waitlist for the exact seat you want across Bengaluru, Delhi, Mumbai, Hyderabad, Chennai and Kochi — and get an SMS the moment it opens up.",
       },
-      { property: "og:title", content: "SeatSync — Bengaluru Movie Waitlists" },
+      { property: "og:title", content: "SeatSync — Movie Waitlists Across India" },
       {
         property: "og:description",
         content:
-          "Join the waitlist for sold-out shows across Bengaluru cinemas and get notified the second a seat frees up.",
+          "Join the waitlist for sold-out shows in six Indian cities and get notified the second a seat frees up.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -31,26 +38,30 @@ const CATEGORIES = ["Movies", "Events", "Plays", "Sports", "Comedy"];
 
 function MovieBrowser() {
   const [category, setCategory] = useState("Movies");
+  const [city, setCity] = useState<CityKey>("bengaluru");
   const { data: waitTotal = 0 } = useQuery({
     queryKey: ["waitlist-total"],
     queryFn: getTotalWaitlistCount,
     refetchInterval: 5000,
   });
 
+  const cityInfo = cityByKey(city);
+  const movies = moviesForCity(city);
+
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <SiteHeader />
+      <SiteHeader city={city} onCityChange={setCity} />
 
       <main className="max-w-7xl mx-auto px-4 md:px-8">
         {/* Hero */}
         <section className="pt-12 pb-8">
-          <p className="label-caps text-xs text-primary mb-3">Bengaluru · Tonight</p>
+          <p className="label-caps text-xs text-primary mb-3">{cityInfo.name} · Tonight</p>
           <h1 className="text-4xl md:text-5xl font-bold leading-tight max-w-2xl">
             What&apos;s showing tonight
           </h1>
           <p className="mt-3 text-muted-foreground text-base max-w-xl">
-            Every show below is sold out. Pick a showtime, tap the seat you want, and join the
-            queue — we&apos;ll text you the moment it frees up.
+            Every show below is sold out in {cityInfo.name}. Pick a showtime, tap the seat you want,
+            and join the queue — we&apos;ll text you the moment it frees up.
           </p>
           <div className="mt-5 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-surface border border-border text-sm">
             <span className="w-2 h-2 rounded-full bg-[#2ecc71]" />
@@ -81,31 +92,48 @@ function MovieBrowser() {
 
         {/* Grid */}
         <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 pb-16">
-          {MOVIES.map((m, idx) => (
-            <MovieCard key={m.slug} movie={m} waitBase={idx * 3 + 7} />
+          {movies.map((m, idx) => (
+            <MovieCard key={m.slug} movie={m} city={city} waitBase={idx * 3 + 7} />
           ))}
         </section>
       </main>
 
       <footer className="border-t border-border">
         <div className="max-w-7xl mx-auto px-4 md:px-8 py-8 text-sm text-muted-foreground">
-          SeatSync · Bengaluru · Smart cancellation & waitlist management
+          SeatSync · {cityInfo.name} · Smart cancellation &amp; waitlist management
         </div>
       </footer>
     </div>
   );
 }
 
-function MovieCard({ movie, waitBase }: { movie: (typeof MOVIES)[number]; waitBase: number }) {
+function MovieCard({
+  movie,
+  city,
+  waitBase,
+}: {
+  movie: Movie;
+  city: CityKey;
+  waitBase: number;
+}) {
   const [open, setOpen] = useState(false);
-  const shown = open ? movie.showtimes : movie.showtimes.slice(0, 2);
+  const showtimes = showtimesFor(movie, city);
+  const shown = open ? showtimes : showtimes.slice(0, 2);
 
   return (
     <article className="card-soft card-lift overflow-hidden">
-      <div className="h-44 relative" style={{ background: movie.poster }}>
+      <div className="h-44 relative overflow-hidden">
+        <img
+          src={movie.poster}
+          alt={`${movie.title} poster artwork`}
+          loading="lazy"
+          width={512}
+          height={768}
+          className="absolute inset-0 w-full h-full object-cover"
+        />
         <div
           className="absolute inset-0"
-          style={{ background: "linear-gradient(180deg, rgba(0,0,0,0.05) 30%, rgba(0,0,0,0.65) 100%)" }}
+          style={{ background: "linear-gradient(180deg, rgba(0,0,0,0.05) 30%, rgba(0,0,0,0.75) 100%)" }}
         />
         <span className="absolute top-3 right-3 px-2.5 py-1 rounded-full bg-white/90 text-[#1c1c1c] text-[11px] font-semibold">
           {movie.rating}
@@ -120,7 +148,7 @@ function MovieCard({ movie, waitBase }: { movie: (typeof MOVIES)[number]; waitBa
           <span className="text-muted-foreground">{movie.genre}</span>
           <span className="text-muted-foreground">{movie.duration}</span>
         </div>
-        <p className="mt-1 text-xs text-muted-foreground">{movie.language}</p>
+        <p className="mt-1 text-xs text-muted-foreground">{languagesFor(movie, city)}</p>
 
         <div className="mt-4 space-y-2">
           {shown.map((st, i) => {
@@ -144,12 +172,12 @@ function MovieCard({ movie, waitBase }: { movie: (typeof MOVIES)[number]; waitBa
           })}
         </div>
 
-        {movie.showtimes.length > 2 && (
+        {showtimes.length > 2 && (
           <button
             onClick={() => setOpen((v) => !v)}
             className="mt-3 text-sm font-semibold text-primary"
           >
-            {open ? "Show less" : `+${movie.showtimes.length - 2} more showtimes`}
+            {open ? "Show less" : `+${showtimes.length - 2} more showtimes`}
           </button>
         )}
       </div>
