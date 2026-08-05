@@ -79,16 +79,44 @@ export function DemoCancellationWidget() {
       <select
         value={selectedId}
         onChange={(e) => setSelectedId(e.target.value)}
-        className="w-full mb-4 px-3 py-2 pastel-inset text-sm focus:outline-none"
+        className="w-full mb-3 px-3 py-2 pastel-inset text-sm focus:outline-none"
         style={{ color: "#2a3547" }}
       >
         <option value="">— pick a seat —</option>
         {seats.map((s) => (
           <option key={s.id} value={s.id}>
             {s.id} — {s.status}
+            {s.locked_by ? ` (${s.locked_by})` : ""}
           </option>
         ))}
       </select>
+
+      {lockedSeats.length > 0 && (
+        <div className="mb-4">
+          <div
+            className="font-mono text-[10px] uppercase tracking-widest mb-1"
+            style={{ color: "#6b7a92" }}
+          >
+            Held by users ({lockedSeats.length})
+          </div>
+          <div className="flex flex-wrap gap-1.5">
+            {lockedSeats.slice(0, 12).map((s) => (
+              <button
+                key={s.id}
+                onClick={() => setSelectedId(s.id)}
+                className="px-2 py-1 rounded-lg text-[11px] font-mono"
+                style={{
+                  background: s.id === selectedId ? "#f8cf6b" : "#fdf0cf",
+                  color: "#6b4d09",
+                }}
+                title={s.locked_by ? `Locked by ${s.locked_by}` : "Locked"}
+              >
+                {s.id}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       <button
         disabled={!selected || isLocked || lockMut.isPending}
@@ -99,19 +127,20 @@ export function DemoCancellationWidget() {
       </button>
 
       <button
-        disabled={!selected || !isLocked || releaseMut.isPending}
+        disabled={!selected || selected.status === "available" || releaseMut.isPending}
         onClick={() => releaseMut.mutate()}
         className="w-full py-2.5 pastel-btn-green font-mono text-xs uppercase tracking-[0.2em] disabled:opacity-40"
       >
-        Release Seat Now
+        {isLocked && selected?.locked_by ? "Force Release (user hold)" : "Release Seat Now"}
       </button>
 
       <div
         className="mt-4 font-mono text-[10px] uppercase tracking-widest text-center"
         style={{ color: "#8a97ad" }}
       >
-        Simulates cancellation flow
+        Manual override · notifies next in queue
       </div>
+
     </div>
   );
 }
