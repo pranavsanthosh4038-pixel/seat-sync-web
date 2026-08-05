@@ -76,7 +76,7 @@ export function SeatGrid({
       </div>
 
       <div className="flex flex-col gap-5 w-full max-w-4xl">
-        {TIERS.map((tier) => (
+        {[...TIERS].reverse().map((tier) => (
           <div key={tier.name}>
             <div className="flex items-center gap-3 mb-2 px-1">
               <span className="text-xs font-semibold text-foreground">{tier.name}</span>
@@ -84,7 +84,8 @@ export function SeatGrid({
               <span className="flex-1 h-px bg-border" />
             </div>
             <div className="flex flex-col gap-1.5">
-              {tier.rows.map((row) => {
+              {[...tier.rows].reverse().map((row) => {
+
                 const rowSeats = Array.from({ length: 16 }, (_, i) =>
                   seatMap.get(`${row}${i + 1}`),
                 );

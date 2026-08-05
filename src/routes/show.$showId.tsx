@@ -128,9 +128,11 @@ function SeatPicker() {
             <div className="min-w-0">
               <h1 className="text-base font-bold truncate">{found?.movie.title ?? "Show"}</h1>
               <p className="text-xs text-muted-foreground truncate">
-                {found?.showtime.theatre} · {found?.showtime.time} · {found?.showtime.screen}
+                {found?.showtime.theatre} · {found?.city.name} · {found?.showtime.time} ·{" "}
+                {found?.showtime.screen} · {found?.showtime.languages}
               </p>
             </div>
+
           </div>
           <div className="flex items-center gap-2 shrink-0">
             <span className="hidden sm:inline-flex px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold">
