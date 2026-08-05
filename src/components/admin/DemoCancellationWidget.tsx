@@ -51,6 +51,8 @@ export function DemoCancellationWidget() {
   });
 
   const isLocked = selected?.status === "locked";
+  const lockedSeats = seats.filter((s) => s.status === "locked");
+
   const mmss = `${String(Math.floor(remaining / 60)).padStart(2, "0")}:${String(
     remaining % 60,
   ).padStart(2, "0")}`;
