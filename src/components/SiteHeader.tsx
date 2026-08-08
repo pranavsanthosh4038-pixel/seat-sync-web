@@ -229,26 +229,137 @@ export function SiteHeader({
   );
 }
 
+function Modal({
+  title,
+  onClose,
+  children,
+}: {
+  title: string;
+  onClose: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+      <button aria-label="Close" onClick={onClose} className="absolute inset-0 bg-black/50" />
+      <div className="relative w-full max-w-md rounded-2xl bg-card border border-border p-6 shadow-[0_24px_60px_-20px_rgba(0,0,0,0.45)]">
+        <div className="flex items-start justify-between gap-4">
+          <h3 className="text-lg font-bold text-foreground">{title}</h3>
+          <button
+            aria-label="Close"
+            onClick={onClose}
+            className="w-8 h-8 rounded-full border border-border flex items-center justify-center text-foreground"
+          >
+            <X size={14} />
+          </button>
+        </div>
+        <div className="mt-4 space-y-2 text-sm text-muted-foreground">{children}</div>
+      </div>
+    </div>
+  );
+}
+
+function AdminPinModal({ onClose }: { onClose: () => void }) {
+  const [pin, setPin] = useState("");
+  const [error, setError] = useState(false);
+  const [shake, setShake] = useState(false);
+  const navigate = useNavigate();
+
+  const submit = () => {
+    if (pin === "2533") {
+      onClose();
+      navigate({ to: "/admin" });
+    } else {
+      setError(true);
+      setShake(true);
+      setTimeout(() => setShake(false), 500);
+    }
+  };
+
+  return (
+    <Modal title="Enter Admin PIN" onClose={onClose}>
+      <input
+        autoFocus
+        value={pin}
+        inputMode="numeric"
+        maxLength={4}
+        onChange={(e) => {
+          setPin(e.target.value.replace(/\D/g, ""));
+          setError(false);
+        }}
+        onKeyDown={(e) => e.key === "Enter" && submit()}
+        placeholder="••••"
+        className={`w-full text-center text-3xl tracking-[0.6em] font-bold py-4 rounded-xl bg-surface border ${
+          error ? "border-primary" : "border-border"
+        } text-foreground outline-none ${shake ? "animate-shake" : ""}`}
+      />
+      {error && <p className="text-primary text-sm font-semibold">Incorrect PIN</p>}
+      <div className="flex gap-2 pt-2">
+        <button
+          onClick={submit}
+          className="flex-1 py-2.5 rounded-full bg-primary text-primary-foreground font-semibold text-sm"
+        >
+          Access Admin
+        </button>
+        <button
+          onClick={onClose}
+          className="px-5 py-2.5 rounded-full border border-border text-foreground font-semibold text-sm"
+        >
+          Cancel
+        </button>
+      </div>
+    </Modal>
+  );
+}
+
 function SideMenu({ onClose, cityName }: { onClose: () => void; cityName: string }) {
-  const items = [
-    { icon: Bell, label: "Notifications", sub: "Seat alerts and waitlist updates" },
-    { icon: Ticket, label: "Your Orders", sub: "View all your bookings & waitlists" },
-    { icon: Heart, label: "Your Wishlist", sub: "Movies and events you saved" },
-    { icon: Gift, label: "Rewards", sub: "View your rewards & unlock new ones" },
-    { icon: HelpCircle, label: "Help & Support", sub: "Common queries and chat" },
-    { icon: Settings, label: "Accounts & Settings", sub: `Location · ${cityName} · Permissions` },
+  const [modal, setModal] = useState<null | "pin" | "help" | "about">(null);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [onClose]);
+
+  const nav = [
+    { emoji: "🏠", label: "Home", to: "/" as const },
+    { emoji: "🎬", label: "Movies", to: "/" as const },
+    { emoji: "🎵", label: "Events", to: "/" as const },
+    { emoji: "🍽️", label: "Dining", to: "/" as const },
+    { emoji: "🏏", label: "Sports", to: "/" as const },
   ];
+
+  const account = [
+    { emoji: "👤", label: "My Bookings" },
+    { emoji: "📋", label: "My Waitlist" },
+  ];
+
+  const Row = ({
+    emoji,
+    label,
+    onClick,
+  }: {
+    emoji: string;
+    label: string;
+    onClick?: () => void;
+  }) => (
+    <button
+      onClick={onClick}
+      className="w-full flex items-center gap-3 px-5 py-3 text-left hover:bg-surface transition-colors"
+    >
+      <span className="text-base w-6 text-center">{emoji}</span>
+      <span className="flex-1 text-sm font-semibold text-foreground">{label}</span>
+      <ChevronRight size={16} className="text-muted-foreground shrink-0" />
+    </button>
+  );
 
   return (
     <div className="fixed inset-0 z-50">
-      <button
-        aria-label="Close menu"
-        onClick={onClose}
-        className="absolute inset-0 bg-black/50"
-      />
-      <aside className="absolute right-0 top-0 h-full w-[min(88vw,380px)] bg-card border-l border-border overflow-y-auto">
-        <div className="flex items-center justify-between px-5 py-4">
-          <h2 className="text-2xl font-bold text-foreground">Hey!</h2>
+      <button aria-label="Close menu" onClick={onClose} className="absolute inset-0 bg-black/50" />
+      <aside className="absolute left-0 top-0 h-full w-[min(86vw,320px)] bg-card border-r border-border overflow-y-auto animate-slide-in-left">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-border">
+          <h2 className="text-xl font-bold text-foreground">
+            Seat<span className="text-primary">Sync</span>
+          </h2>
           <button
             aria-label="Close menu"
             onClick={onClose}
@@ -258,52 +369,55 @@ function SideMenu({ onClose, cityName }: { onClose: () => void; cityName: string
           </button>
         </div>
 
-        <div className="mx-4 mb-2 flex items-center gap-3 rounded-2xl border border-border p-3">
-          <span className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-            <Gift size={18} className="text-primary" />
-          </span>
-          <p className="flex-1 text-sm font-medium text-primary leading-tight">
-            Unlock special offers &amp; great benefits
-          </p>
-          <Link
-            to="/auth"
-            onClick={onClose}
-            className="shrink-0 px-3 py-1.5 rounded-full border border-primary text-primary text-xs font-semibold"
-          >
-            Login / Register
-          </Link>
-        </div>
-
-        <nav className="divide-y divide-border border-y border-border mt-2">
-          {items.map(({ icon: Icon, label, sub }) => (
-            <button
-              key={label}
-              className="w-full flex items-center gap-3 px-5 py-4 text-left hover:bg-surface transition-colors"
+        <nav className="py-2">
+          {nav.map((n) => (
+            <Link
+              key={n.label}
+              to={n.to}
+              onClick={onClose}
+              className="w-full flex items-center gap-3 px-5 py-3 hover:bg-surface transition-colors"
             >
-              <Icon size={18} className="text-muted-foreground shrink-0" />
-              <span className="min-w-0 flex-1">
-                <span className="block text-sm font-semibold text-foreground">{label}</span>
-                <span className="block text-xs text-muted-foreground truncate">{sub}</span>
-              </span>
+              <span className="text-base w-6 text-center">{n.emoji}</span>
+              <span className="flex-1 text-sm font-semibold text-foreground">{n.label}</span>
               <ChevronRight size={16} className="text-muted-foreground shrink-0" />
-            </button>
+            </Link>
           ))}
-          <Link
-            to="/admin"
-            onClick={onClose}
-            className="w-full flex items-center gap-3 px-5 py-4 hover:bg-surface transition-colors"
-          >
-            <LayoutDashboard size={18} className="text-muted-foreground shrink-0" />
-            <span className="min-w-0 flex-1">
-              <span className="block text-sm font-semibold text-foreground">Admin Dashboard</span>
-              <span className="block text-xs text-muted-foreground">
-                Manage shows, seats and queues
-              </span>
-            </span>
-            <ChevronRight size={16} className="text-muted-foreground shrink-0" />
-          </Link>
+
+          <div className="my-2 border-t border-border" />
+          {account.map((a) => (
+            <Row key={a.label} emoji={a.emoji} label={a.label} />
+          ))}
+
+          <div className="my-2 border-t border-border" />
+          <Row emoji="🔐" label="Admin Panel" onClick={() => setModal("pin")} />
+          <Row emoji="❓" label="Help & Support" onClick={() => setModal("help")} />
+          <Row emoji="ℹ️" label="About SeatSync" onClick={() => setModal("about")} />
         </nav>
+
+        <p className="px-5 py-4 text-[11px] text-muted-foreground">
+          Location · {cityName}
+        </p>
       </aside>
+
+      {modal === "pin" && <AdminPinModal onClose={() => setModal(null)} />}
+      {modal === "help" && (
+        <Modal title="Help & Support" onClose={() => setModal(null)}>
+          <p>For support, contact: help@seatsync.in</p>
+          <p>SeatSync is a student project by CHRIST University, Bengaluru</p>
+          <p>Course: Digital Business Systems · Batch 2025–2028</p>
+        </Modal>
+      )}
+      {modal === "about" && (
+        <Modal title="About SeatSync" onClose={() => setModal(null)}>
+          <p>SeatSync is an intelligent seat waitlisting system built for BookMyShow</p>
+          <p>
+            Built by: Apeksha Vemali, Ardra Jyothikumar, Cattamanchi Parthiv Reddy, Pranav, Roopika
+            Yallamelli
+          </p>
+          <p>Faculty: Dr. Chandravesh Chaudhari</p>
+          <p>CHRIST (Deemed to be University), Bengaluru</p>
+        </Modal>
+      )}
     </div>
   );
 }
