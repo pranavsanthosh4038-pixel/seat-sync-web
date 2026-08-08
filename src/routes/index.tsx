@@ -256,11 +256,16 @@ function MovieCard({
 
   return (
     <article className="card-soft card-lift overflow-hidden">
-      <div className="h-44 relative overflow-hidden">
+      <div className="aspect-[2/3] relative overflow-hidden">
         <img
           src={movie.poster}
           alt={`${movie.title} poster artwork`}
           loading="lazy"
+          onError={(e) => {
+            const img = e.currentTarget;
+            const fallback = `https://placehold.co/500x750/1a1a1a/ffffff?text=${encodeURIComponent(movie.title)}`;
+            if (img.src !== fallback) img.src = fallback;
+          }}
           width={512}
           height={768}
           className="absolute inset-0 w-full h-full object-cover"
