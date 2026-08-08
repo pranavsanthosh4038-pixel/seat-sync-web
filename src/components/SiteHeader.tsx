@@ -1,19 +1,5 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import {
-  Bell,
-  ChevronDown,
-  ChevronRight,
-  Gift,
-  HelpCircle,
-  Heart,
-  LayoutDashboard,
-  MapPin,
-  Menu,
-  Search,
-  Settings,
-  Ticket,
-  X,
-} from "lucide-react";
+import { ChevronDown, ChevronRight, MapPin, Menu, Search, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { CITIES, cityByKey, moviesForCity, showtimesFor, type CityKey } from "@/lib/movies";

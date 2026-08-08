@@ -256,7 +256,7 @@ function MovieCard({
 
   return (
     <article className="card-soft card-lift overflow-hidden">
-      <div className="h-44 relative overflow-hidden">
+      <div className="aspect-[2/3] relative overflow-hidden">
         <img
           src={movie.poster}
           alt={`${movie.title} poster artwork`}
