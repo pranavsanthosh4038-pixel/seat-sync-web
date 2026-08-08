@@ -204,7 +204,7 @@ export const MOVIES: Movie[] = [
     languages: ["English", "Hindi"],
     rating: "UA",
     duration: "2h 09m",
-    poster: tmdb("/uXIQDjEamAbBAZ79y6OhvcAKOzs.jpg"),
+    poster: tmdb("/ombsmhYUqR4qqOLOxAyr5V8hbyv.jpg"),
     cities: ALL,
     dubbed: ["hyderabad", "chennai", "kochi"],
     times: T3,
