@@ -261,6 +261,11 @@ function MovieCard({
           src={movie.poster}
           alt={`${movie.title} poster artwork`}
           loading="lazy"
+          onError={(e) => {
+            const img = e.currentTarget;
+            const fallback = `https://placehold.co/500x750/1a1a1a/ffffff?text=${encodeURIComponent(movie.title)}`;
+            if (img.src !== fallback) img.src = fallback;
+          }}
           width={512}
           height={768}
           className="absolute inset-0 w-full h-full object-cover"

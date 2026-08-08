@@ -150,6 +150,11 @@ export function SiteHeader({
                     src={r.image}
                     alt=""
                     loading="lazy"
+                    onError={(e) => {
+                      const img = e.currentTarget;
+                      const fb = `https://placehold.co/500x750/1a1a1a/ffffff?text=${encodeURIComponent(r.title)}`;
+                      if (img.src !== fb) img.src = fb;
+                    }}
                     className="w-10 h-14 rounded-lg object-cover shrink-0"
                   />
                   <span className="min-w-0">
