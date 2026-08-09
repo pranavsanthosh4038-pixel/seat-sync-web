@@ -318,7 +318,7 @@ function SideMenu({ onClose, cityName }: { onClose: () => void; cityName: string
   }, [onClose]);
 
   const rowClass =
-    "w-full flex items-center gap-4 px-5 py-2.5 text-left text-sm font-semibold text-foreground rounded-xl transition-colors hover:bg-primary/10 hover:text-primary";
+    "w-full h-10 flex items-center gap-4 px-4 text-left text-sm font-medium text-foreground transition-colors hover:bg-[#f2f2f2] dark:hover:bg-[#3f3f3f]";
 
   const Row = ({
     emoji,
@@ -330,15 +330,19 @@ function SideMenu({ onClose, cityName }: { onClose: () => void; cityName: string
     onClick?: () => void;
   }) => (
     <button onClick={onClick} className={rowClass}>
-      <span className="text-base w-6 text-center">{emoji}</span>
+      <span className="w-5 text-[20px] leading-none text-center">{emoji}</span>
       <span className="flex-1">{label}</span>
     </button>
   );
 
   const SectionLabel = ({ children }: { children: React.ReactNode }) => (
-    <p className="px-5 pt-4 pb-1 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+    <p className="pt-4 pb-1 px-4 text-xs uppercase tracking-[0.5px] text-[#606060] dark:text-[#aaaaaa]">
       {children}
     </p>
+  );
+
+  const Divider = () => (
+    <div className="my-2 border-t border-[#e5e5e5] dark:border-[#3f3f3f]" />
   );
 
   const navItems = [
@@ -347,56 +351,62 @@ function SideMenu({ onClose, cityName }: { onClose: () => void; cityName: string
     { emoji: "🎵", label: "Events" },
     { emoji: "🏏", label: "Sports" },
     { emoji: "🍽️", label: "Dining" },
+    { emoji: "🎭", label: "Plays" },
   ];
 
   return (
-    <div className="fixed inset-0 z-50">
-      <button
-        aria-label="Close menu"
+    <>
+      <div
+        role="presentation"
         onClick={onClose}
-        className="absolute inset-0 bg-[#00000080]"
+        className="fixed inset-0 z-[9998] bg-black/50"
       />
-      <aside className="absolute left-0 top-0 h-full w-[min(86vw,280px)] bg-card border-r border-border overflow-y-auto animate-slide-in-left">
-        <div className="flex items-center justify-between px-5 py-4 border-b border-border">
-          <div>
-            <h2 className="text-xl font-bold text-foreground leading-none">
-              Seat<span className="text-primary">Sync</span>
-            </h2>
-            <p className="text-[11px] uppercase tracking-wider text-muted-foreground mt-1">Menu</p>
-          </div>
+      <aside
+        onClick={(e) => e.stopPropagation()}
+        style={{ transition: "transform 0.25s ease" }}
+        className="fixed left-0 top-0 h-screen w-[280px] max-w-[86vw] z-[9999] bg-white dark:bg-[#212121] overflow-y-auto animate-slide-in-left"
+      >
+        <div className="h-16 flex items-center gap-4 px-4">
           <button
             aria-label="Close menu"
             onClick={onClose}
-            className="w-9 h-9 rounded-full border border-border flex items-center justify-center text-foreground"
+            className="w-9 h-9 shrink-0 rounded-full flex items-center justify-center text-foreground hover:bg-[#f2f2f2] dark:hover:bg-[#3f3f3f] transition-colors"
           >
-            <X size={16} />
+            <Menu size={18} />
           </button>
+          <span className="text-xl font-bold tracking-tight text-foreground">
+            Seat<span className="text-primary">Sync</span>
+          </span>
         </div>
 
-        <nav className="py-2 px-1.5">
+        <nav className="pb-4">
           {navItems.map((n) => (
             <Link key={n.label} to="/" onClick={onClose} className={rowClass}>
-              <span className="text-base w-6 text-center">{n.emoji}</span>
+              <span className="w-5 text-[20px] leading-none text-center">{n.emoji}</span>
               <span className="flex-1">{n.label}</span>
             </Link>
           ))}
 
-          <div className="mt-2 border-t border-border" />
+          <Divider />
           <SectionLabel>You</SectionLabel>
           <Row emoji="📋" label="My Waitlist" />
           <Row emoji="🎟️" label="My Bookings" />
           <Row emoji="🕐" label="Recently Viewed" />
 
-          <div className="mt-2 border-t border-border" />
+          <Divider />
           <SectionLabel>More from SeatSync</SectionLabel>
           <Row emoji="🔐" label="Admin Panel" onClick={() => setModal("pin")} />
           <Row emoji="❓" label="Help & Support" onClick={() => setModal("help")} />
           <Row emoji="ℹ️" label="About SeatSync" onClick={() => setModal("about")} />
           <Row emoji="⚙️" label="Settings" />
-        </nav>
 
-        <p className="px-5 py-4 text-[11px] text-muted-foreground">Location · {cityName}</p>
+          <Divider />
+          <p className="px-4 py-2 text-[11px] text-[#606060] dark:text-[#aaaaaa]">
+            Location · {cityName}
+          </p>
+        </nav>
       </aside>
+
 
       {modal === "pin" && <AdminPinModal onClose={() => setModal(null)} />}
       {modal === "help" && (
@@ -434,6 +444,6 @@ function SideMenu({ onClose, cityName }: { onClose: () => void; cityName: string
           </button>
         </Modal>
       )}
-    </div>
+    </>
   );
 }
