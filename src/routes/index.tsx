@@ -277,6 +277,11 @@ function MovieCard({
         <span className="absolute top-3 right-3 px-2.5 py-1 rounded-full bg-white/90 text-[#1c1c1c] text-[11px] font-semibold">
           {movie.rating}
         </span>
+        {movie.badge && (
+          <span className="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-primary text-primary-foreground text-[10px] font-bold uppercase tracking-wide">
+            {movie.badge}
+          </span>
+        )}
         <h3 className="absolute bottom-3 left-4 right-4 text-xl font-bold text-white">
           {movie.title}
         </h3>
