@@ -444,6 +444,6 @@ function SideMenu({ onClose, cityName }: { onClose: () => void; cityName: string
           </button>
         </Modal>
       )}
-    </div>
+    </>
   );
 }
