@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { ChevronDown, ChevronRight, MapPin, Menu, Search, X } from "lucide-react";
+import { ChevronDown, MapPin, Menu, Search, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { CITIES, cityByKey, moviesForCity, showtimesFor, type CityKey } from "@/lib/movies";
