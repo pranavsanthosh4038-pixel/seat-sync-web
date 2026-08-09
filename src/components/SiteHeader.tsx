@@ -251,53 +251,59 @@ function Modal({
 
 function AdminPinModal({ onClose }: { onClose: () => void }) {
   const [pin, setPin] = useState("");
-  const [error, setError] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [shake, setShake] = useState(false);
-  const navigate = useNavigate();
+  const [attempts, setAttempts] = useState(0);
+  const locked = attempts >= 3;
 
   const submit = () => {
+    if (locked) return;
     if (pin === "2533") {
       onClose();
-      navigate({ to: "/admin" });
+      window.open("/admin", "_blank", "noopener");
     } else {
-      setError(true);
+      const next = attempts + 1;
+      setAttempts(next);
+      setError(next >= 3 ? "Too many attempts. Contact your administrator." : "Incorrect PIN");
       setShake(true);
       setTimeout(() => setShake(false), 500);
     }
   };
 
   return (
-    <Modal title="Enter Admin PIN" onClose={onClose}>
+    <Modal title="Admin Access" onClose={onClose}>
+      <p className="text-sm text-muted-foreground">Enter your 4-digit PIN to continue</p>
       <input
         autoFocus
+        type="password"
         value={pin}
         inputMode="numeric"
         maxLength={4}
+        disabled={locked}
         onChange={(e) => {
           setPin(e.target.value.replace(/\D/g, ""));
-          setError(false);
+          setError(null);
         }}
         onKeyDown={(e) => e.key === "Enter" && submit()}
         placeholder="••••"
         className={`w-full text-center text-3xl tracking-[0.6em] font-bold py-4 rounded-xl bg-surface border ${
           error ? "border-primary" : "border-border"
-        } text-foreground outline-none ${shake ? "animate-shake" : ""}`}
+        } text-foreground outline-none disabled:opacity-50 ${shake ? "animate-shake" : ""}`}
       />
-      {error && <p className="text-primary text-sm font-semibold">Incorrect PIN</p>}
-      <div className="flex gap-2 pt-2">
-        <button
-          onClick={submit}
-          className="flex-1 py-2.5 rounded-full bg-primary text-primary-foreground font-semibold text-sm"
-        >
-          Access Admin
-        </button>
-        <button
-          onClick={onClose}
-          className="px-5 py-2.5 rounded-full border border-border text-foreground font-semibold text-sm"
-        >
-          Cancel
-        </button>
-      </div>
+      {error && <p className="text-primary text-sm font-semibold">{error}</p>}
+      <button
+        onClick={submit}
+        disabled={locked}
+        className="w-full py-3 rounded-full bg-primary text-primary-foreground font-semibold text-sm disabled:opacity-50"
+      >
+        Continue
+      </button>
+      <button
+        onClick={onClose}
+        className="w-full text-sm font-semibold text-muted-foreground underline underline-offset-4"
+      >
+        Cancel
+      </button>
     </Modal>
   );
 }
@@ -311,18 +317,8 @@ function SideMenu({ onClose, cityName }: { onClose: () => void; cityName: string
     return () => document.removeEventListener("keydown", onKey);
   }, [onClose]);
 
-  const nav = [
-    { emoji: "🏠", label: "Home", to: "/" as const },
-    { emoji: "🎬", label: "Movies", to: "/" as const },
-    { emoji: "🎵", label: "Events", to: "/" as const },
-    { emoji: "🍽️", label: "Dining", to: "/" as const },
-    { emoji: "🏏", label: "Sports", to: "/" as const },
-  ];
-
-  const account = [
-    { emoji: "👤", label: "My Bookings" },
-    { emoji: "📋", label: "My Waitlist" },
-  ];
+  const rowClass =
+    "w-full flex items-center gap-4 px-5 py-2.5 text-left text-sm font-semibold text-foreground rounded-xl transition-colors hover:bg-primary/10 hover:text-primary";
 
   const Row = ({
     emoji,
@@ -333,24 +329,41 @@ function SideMenu({ onClose, cityName }: { onClose: () => void; cityName: string
     label: string;
     onClick?: () => void;
   }) => (
-    <button
-      onClick={onClick}
-      className="w-full flex items-center gap-3 px-5 py-3 text-left hover:bg-surface transition-colors"
-    >
+    <button onClick={onClick} className={rowClass}>
       <span className="text-base w-6 text-center">{emoji}</span>
-      <span className="flex-1 text-sm font-semibold text-foreground">{label}</span>
-      <ChevronRight size={16} className="text-muted-foreground shrink-0" />
+      <span className="flex-1">{label}</span>
     </button>
   );
 
+  const SectionLabel = ({ children }: { children: React.ReactNode }) => (
+    <p className="px-5 pt-4 pb-1 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+      {children}
+    </p>
+  );
+
+  const navItems = [
+    { emoji: "🏠", label: "Home" },
+    { emoji: "🎬", label: "Movies" },
+    { emoji: "🎵", label: "Events" },
+    { emoji: "🏏", label: "Sports" },
+    { emoji: "🍽️", label: "Dining" },
+  ];
+
   return (
     <div className="fixed inset-0 z-50">
-      <button aria-label="Close menu" onClick={onClose} className="absolute inset-0 bg-black/50" />
-      <aside className="absolute left-0 top-0 h-full w-[min(86vw,320px)] bg-card border-r border-border overflow-y-auto animate-slide-in-left">
+      <button
+        aria-label="Close menu"
+        onClick={onClose}
+        className="absolute inset-0 bg-[#00000080]"
+      />
+      <aside className="absolute left-0 top-0 h-full w-[min(86vw,280px)] bg-card border-r border-border overflow-y-auto animate-slide-in-left">
         <div className="flex items-center justify-between px-5 py-4 border-b border-border">
-          <h2 className="text-xl font-bold text-foreground">
-            Seat<span className="text-primary">Sync</span>
-          </h2>
+          <div>
+            <h2 className="text-xl font-bold text-foreground leading-none">
+              Seat<span className="text-primary">Sync</span>
+            </h2>
+            <p className="text-[11px] uppercase tracking-wider text-muted-foreground mt-1">Menu</p>
+          </div>
           <button
             aria-label="Close menu"
             onClick={onClose}
@@ -360,53 +373,65 @@ function SideMenu({ onClose, cityName }: { onClose: () => void; cityName: string
           </button>
         </div>
 
-        <nav className="py-2">
-          {nav.map((n) => (
-            <Link
-              key={n.label}
-              to={n.to}
-              onClick={onClose}
-              className="w-full flex items-center gap-3 px-5 py-3 hover:bg-surface transition-colors"
-            >
+        <nav className="py-2 px-1.5">
+          {navItems.map((n) => (
+            <Link key={n.label} to="/" onClick={onClose} className={rowClass}>
               <span className="text-base w-6 text-center">{n.emoji}</span>
-              <span className="flex-1 text-sm font-semibold text-foreground">{n.label}</span>
-              <ChevronRight size={16} className="text-muted-foreground shrink-0" />
+              <span className="flex-1">{n.label}</span>
             </Link>
           ))}
 
-          <div className="my-2 border-t border-border" />
-          {account.map((a) => (
-            <Row key={a.label} emoji={a.emoji} label={a.label} />
-          ))}
+          <div className="mt-2 border-t border-border" />
+          <SectionLabel>You</SectionLabel>
+          <Row emoji="📋" label="My Waitlist" />
+          <Row emoji="🎟️" label="My Bookings" />
+          <Row emoji="🕐" label="Recently Viewed" />
 
-          <div className="my-2 border-t border-border" />
+          <div className="mt-2 border-t border-border" />
+          <SectionLabel>More from SeatSync</SectionLabel>
           <Row emoji="🔐" label="Admin Panel" onClick={() => setModal("pin")} />
           <Row emoji="❓" label="Help & Support" onClick={() => setModal("help")} />
           <Row emoji="ℹ️" label="About SeatSync" onClick={() => setModal("about")} />
+          <Row emoji="⚙️" label="Settings" />
         </nav>
 
-        <p className="px-5 py-4 text-[11px] text-muted-foreground">
-          Location · {cityName}
-        </p>
+        <p className="px-5 py-4 text-[11px] text-muted-foreground">Location · {cityName}</p>
       </aside>
 
       {modal === "pin" && <AdminPinModal onClose={() => setModal(null)} />}
       {modal === "help" && (
-        <Modal title="Help & Support" onClose={() => setModal(null)}>
-          <p>For support, contact: help@seatsync.in</p>
-          <p>SeatSync is a student project by CHRIST University, Bengaluru</p>
-          <p>Course: Digital Business Systems · Batch 2025–2028</p>
+        <Modal title="Need help?" onClose={() => setModal(null)}>
+          <p>Email us: help@seatsync.in</p>
+          <p>SeatSync is a Digital Business Systems project</p>
+          <p>CHRIST (Deemed to be University), Bengaluru · Batch 2025–2028</p>
+          <p>Faculty Mentor: Dr. Chandravesh Chaudhari</p>
+          <button
+            onClick={() => setModal(null)}
+            className="mt-2 w-full py-2.5 rounded-full bg-primary text-primary-foreground font-semibold text-sm"
+          >
+            Close
+          </button>
         </Modal>
       )}
       {modal === "about" && (
         <Modal title="About SeatSync" onClose={() => setModal(null)}>
-          <p>SeatSync is an intelligent seat waitlisting system built for BookMyShow</p>
           <p>
-            Built by: Apeksha Vemali, Ardra Jyothikumar, Cattamanchi Parthiv Reddy, Pranav, Roopika
-            Yallamelli
+            SeatSync is an intelligent dynamic waitlisting system built to solve BookMyShow's seat
+            cancellation and load management problem.
           </p>
+          <p>
+            Built by: Apeksha Vemali · Ardra Jyothikumar · Cattamanchi Parthiv Reddy · Pranav ·
+            Roopika Yallamelli
+          </p>
+          <p>Course: Digital Business Systems (ECD223-3)</p>
           <p>Faculty: Dr. Chandravesh Chaudhari</p>
-          <p>CHRIST (Deemed to be University), Bengaluru</p>
+          <p>Version: v1.0 · July 2026</p>
+          <button
+            onClick={() => setModal(null)}
+            className="mt-2 w-full py-2.5 rounded-full bg-primary text-primary-foreground font-semibold text-sm"
+          >
+            Close
+          </button>
         </Modal>
       )}
     </div>
