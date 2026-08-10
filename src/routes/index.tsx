@@ -199,6 +199,11 @@ function EventCard({
           src={event.image}
           alt={`${event.title} artwork`}
           loading="lazy"
+          onError={(e) => {
+            const img = e.currentTarget;
+            const fallback = `https://placehold.co/300x450/111111/ffffff?text=${encodeURIComponent(event.title)}`;
+            if (img.src !== fallback) img.src = fallback;
+          }}
           width={1024}
           height={640}
           className="absolute inset-0 w-full h-full object-cover"
