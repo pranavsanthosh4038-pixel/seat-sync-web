@@ -1,7 +1,13 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { ChevronDown, MapPin, Menu, Search, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { ThemeToggle } from "@/components/ThemeToggle";
+import { ThemeToggle, getTheme, setTheme } from "@/components/ThemeToggle";
+import {
+  getNotificationsPref,
+  getRecentlyViewed,
+  setNotificationsPref,
+  type RecentItem,
+} from "@/lib/local-store";
 import { CITIES, cityByKey, moviesForCity, showtimesFor, type CityKey } from "@/lib/movies";
 import { eventsFor, venueFor } from "@/lib/events";
 
@@ -18,11 +24,13 @@ export function SiteHeader({
   onCityChange,
   query,
   onQueryChange,
+  onCategoryChange,
 }: {
   city?: CityKey;
   onCityChange?: (c: CityKey) => void;
   query?: string;
   onQueryChange?: (q: string) => void;
+  onCategoryChange?: (c: string) => void;
 }) {
   const [open, setOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -215,7 +223,13 @@ export function SiteHeader({
         <ThemeToggle />
       </div>
 
-      {menuOpen && <SideMenu onClose={() => setMenuOpen(false)} cityName={activeCity.name} />}
+      {menuOpen && (
+        <SideMenu
+          onClose={() => setMenuOpen(false)}
+          cityName={activeCity.name}
+          onCategoryChange={onCategoryChange}
+        />
+      )}
     </header>
   );
 }
@@ -308,8 +322,105 @@ function AdminPinModal({ onClose }: { onClose: () => void }) {
   );
 }
 
-function SideMenu({ onClose, cityName }: { onClose: () => void; cityName: string }) {
-  const [modal, setModal] = useState<null | "pin" | "help" | "about">(null);
+function scrollToGrid() {
+  requestAnimationFrame(() => {
+    const el = document.getElementById("browse-grid");
+    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+    else window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+}
+
+function SettingsModal({ onClose }: { onClose: () => void }) {
+  const [dark, setDark] = useState(false);
+  const [notify, setNotify] = useState(true);
+
+  useEffect(() => {
+    setDark(getTheme() === "dark");
+    setNotify(getNotificationsPref());
+  }, []);
+
+  const Toggle = ({ on, onToggle }: { on: boolean; onToggle: () => void }) => (
+    <button
+      role="switch"
+      aria-checked={on}
+      onClick={onToggle}
+      className={`w-11 h-6 shrink-0 rounded-full transition-colors ${on ? "bg-primary" : "bg-border"}`}
+    >
+      <span
+        className={`block w-5 h-5 rounded-full bg-white shadow transition-transform ${on ? "translate-x-[22px]" : "translate-x-[2px]"}`}
+      />
+    </button>
+  );
+
+  return (
+    <Modal title="Settings" onClose={onClose}>
+      <div className="flex items-center justify-between gap-4">
+        <span className="text-sm font-medium text-foreground">Dark Mode</span>
+        <Toggle
+          on={dark}
+          onToggle={() => {
+            const next = !dark;
+            setDark(next);
+            setTheme(next ? "dark" : "light");
+          }}
+        />
+      </div>
+      <div className="flex items-center justify-between gap-4">
+        <span className="text-sm text-foreground">
+          <span className="block font-medium">Notifications</span>
+          <span className="block text-xs text-muted-foreground">
+            Get notified when your waitlisted seat opens up
+          </span>
+        </span>
+        <Toggle
+          on={notify}
+          onToggle={() => {
+            const next = !notify;
+            setNotify(next);
+            setNotificationsPref(next);
+          }}
+        />
+      </div>
+    </Modal>
+  );
+}
+
+function RecentlyViewedModal({ onClose }: { onClose: () => void }) {
+  const [items, setItems] = useState<RecentItem[]>([]);
+  useEffect(() => setItems(getRecentlyViewed()), []);
+  return (
+    <Modal title="Recently Viewed" onClose={onClose}>
+      {items.length === 0 ? (
+        <p>You haven&apos;t viewed any movies yet in this session.</p>
+      ) : (
+        <ul className="space-y-2">
+          {items.map((r) => (
+            <li
+              key={r.slug}
+              className="flex items-center justify-between gap-3 px-3 py-2 rounded-xl bg-surface border border-border"
+            >
+              <span className="text-sm font-semibold text-foreground truncate">{r.title}</span>
+              <span className="text-xs text-muted-foreground shrink-0">{r.showtime}</span>
+            </li>
+          ))}
+        </ul>
+      )}
+    </Modal>
+  );
+}
+
+function SideMenu({
+  onClose,
+  cityName,
+  onCategoryChange,
+}: {
+  onClose: () => void;
+  cityName: string;
+  onCategoryChange?: (c: string) => void;
+}) {
+  const [modal, setModal] = useState<
+    null | "pin" | "help" | "about" | "waitlist" | "bookings" | "recent" | "settings"
+  >(null);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
@@ -354,6 +465,16 @@ function SideMenu({ onClose, cityName }: { onClose: () => void; cityName: string
     { emoji: "🎭", label: "Plays" },
   ];
 
+  const handleNav = (label: string) => {
+    onClose();
+    if (label === "Home") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+    onCategoryChange?.(label);
+    scrollToGrid();
+  };
+
   return (
     <>
       <div
@@ -381,24 +502,21 @@ function SideMenu({ onClose, cityName }: { onClose: () => void; cityName: string
 
         <nav className="pb-4">
           {navItems.map((n) => (
-            <Link key={n.label} to="/" onClick={onClose} className={rowClass}>
-              <span className="w-5 text-[20px] leading-none text-center">{n.emoji}</span>
-              <span className="flex-1">{n.label}</span>
-            </Link>
+            <Row key={n.label} emoji={n.emoji} label={n.label} onClick={() => handleNav(n.label)} />
           ))}
 
           <Divider />
           <SectionLabel>You</SectionLabel>
-          <Row emoji="📋" label="My Waitlist" />
-          <Row emoji="🎟️" label="My Bookings" />
-          <Row emoji="🕐" label="Recently Viewed" />
+          <Row emoji="📋" label="My Waitlist" onClick={() => setModal("waitlist")} />
+          <Row emoji="🎟️" label="My Bookings" onClick={() => setModal("bookings")} />
+          <Row emoji="🕐" label="Recently Viewed" onClick={() => setModal("recent")} />
 
           <Divider />
           <SectionLabel>More from SeatSync</SectionLabel>
           <Row emoji="🔐" label="Admin Panel" onClick={() => setModal("pin")} />
           <Row emoji="❓" label="Help & Support" onClick={() => setModal("help")} />
           <Row emoji="ℹ️" label="About SeatSync" onClick={() => setModal("about")} />
-          <Row emoji="⚙️" label="Settings" />
+          <Row emoji="⚙️" label="Settings" onClick={() => setModal("settings")} />
 
           <Divider />
           <p className="px-4 py-2 text-[11px] text-[#606060] dark:text-[#aaaaaa]">
@@ -409,6 +527,21 @@ function SideMenu({ onClose, cityName }: { onClose: () => void; cityName: string
 
 
       {modal === "pin" && <AdminPinModal onClose={() => setModal(null)} />}
+      {modal === "waitlist" && (
+        <Modal title="My Waitlist" onClose={() => setModal(null)}>
+          <p>
+            You have no active waitlist entries yet. Browse movies and join a waitlist to see your
+            entries here.
+          </p>
+        </Modal>
+      )}
+      {modal === "bookings" && (
+        <Modal title="My Bookings" onClose={() => setModal(null)}>
+          <p>No confirmed bookings yet.</p>
+        </Modal>
+      )}
+      {modal === "recent" && <RecentlyViewedModal onClose={() => setModal(null)} />}
+      {modal === "settings" && <SettingsModal onClose={() => setModal(null)} />}
       {modal === "help" && (
         <Modal title="Need help?" onClose={() => setModal(null)}>
           <p>Email us: help@seatsync.in</p>
