@@ -12,6 +12,7 @@ import {
 import { eventsFor, venueFor, type EventCategory, type LiveEvent } from "@/lib/events";
 import { getTotalWaitlistCount } from "@/lib/seats";
 import { SiteHeader } from "@/components/SiteHeader";
+import { addRecentlyViewed } from "@/lib/local-store";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -90,7 +91,18 @@ function MovieBrowser() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <SiteHeader city={city} onCityChange={setCity} query={query} onQueryChange={setQuery} />
+      <SiteHeader
+        city={city}
+        onCityChange={setCity}
+        query={query}
+        onQueryChange={setQuery}
+        onCategoryChange={(c) => {
+          if ((CATEGORIES as readonly string[]).includes(c)) {
+            setCategory(c as Category);
+            setLanguage("All");
+          }
+        }}
+      />
 
       <main className="max-w-7xl mx-auto px-4 md:px-8">
         {/* Hero */}
@@ -158,11 +170,11 @@ function MovieBrowser() {
 
         {/* Grid */}
         {empty ? (
-          <p className="py-16 text-center text-muted-foreground">
+          <p id="browse-grid" className="py-16 text-center text-muted-foreground">
             Nothing in {category} matching your filters in {cityInfo.name}.
           </p>
         ) : (
-          <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 pb-16">
+          <section id="browse-grid" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 pb-16">
             {isMovies
               ? movies.map((m, idx) => (
                   <MovieCard key={m.slug} movie={m} city={city} waitBase={idx * 3 + 7} />
@@ -307,6 +319,14 @@ function MovieCard({
                 key={st.id}
                 to="/show/$showId"
                 params={{ showId: st.id }}
+                onClick={() =>
+                  addRecentlyViewed({
+                    slug: movie.slug,
+                    title: movie.title,
+                    showtime: st.time,
+                    theatre: st.theatre,
+                  })
+                }
                 className="flex items-center justify-between gap-3 px-3 py-2.5 rounded-xl bg-surface border border-border hover:border-primary transition-colors"
               >
                 <div className="min-w-0">

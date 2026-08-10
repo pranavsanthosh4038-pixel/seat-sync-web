@@ -7,21 +7,33 @@ export function applyTheme(theme: "light" | "dark") {
   root.style.colorScheme = theme;
 }
 
+export const THEME_EVENT = "seatsync-theme-change";
+
+export function setTheme(theme: "light" | "dark") {
+  localStorage.setItem("seatsync-theme", theme);
+  applyTheme(theme);
+  window.dispatchEvent(new CustomEvent(THEME_EVENT, { detail: theme }));
+}
+
+export function getTheme(): "light" | "dark" {
+  if (typeof window === "undefined") return "light";
+  return (localStorage.getItem("seatsync-theme") as "light" | "dark" | null) ?? "light";
+}
+
 export function ThemeToggle() {
-  const [theme, setTheme] = useState<"light" | "dark">("light");
+  const [theme, setThemeState] = useState<"light" | "dark">("light");
 
   useEffect(() => {
     const stored = (localStorage.getItem("seatsync-theme") as "light" | "dark" | null) ?? "light";
-    setTheme(stored);
+    setThemeState(stored);
     applyTheme(stored);
+    const onChange = (e: Event) =>
+      setThemeState((e as CustomEvent<"light" | "dark">).detail ?? "light");
+    window.addEventListener(THEME_EVENT, onChange);
+    return () => window.removeEventListener(THEME_EVENT, onChange);
   }, []);
 
-  const toggle = () => {
-    const next = theme === "dark" ? "light" : "dark";
-    setTheme(next);
-    localStorage.setItem("seatsync-theme", next);
-    applyTheme(next);
-  };
+  const toggle = () => setTheme(theme === "dark" ? "light" : "dark");
 
   return (
     <button
