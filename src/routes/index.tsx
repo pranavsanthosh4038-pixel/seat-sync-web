@@ -263,7 +263,7 @@ function MovieCard({
           loading="lazy"
           onError={(e) => {
             const img = e.currentTarget;
-            const fallback = `https://placehold.co/500x750/1a1a1a/ffffff?text=${encodeURIComponent(movie.title)}`;
+            const fallback = `https://placehold.co/300x450/111111/ffffff?text=${encodeURIComponent(movie.title)}`;
             if (img.src !== fallback) img.src = fallback;
           }}
           width={512}

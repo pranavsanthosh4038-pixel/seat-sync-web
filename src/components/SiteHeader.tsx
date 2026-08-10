@@ -152,7 +152,7 @@ export function SiteHeader({
                     loading="lazy"
                     onError={(e) => {
                       const img = e.currentTarget;
-                      const fb = `https://placehold.co/500x750/1a1a1a/ffffff?text=${encodeURIComponent(r.title)}`;
+                      const fb = `https://placehold.co/300x450/111111/ffffff?text=${encodeURIComponent(r.title)}`;
                       if (img.src !== fb) img.src = fb;
                     }}
                     className="w-10 h-14 rounded-lg object-cover shrink-0"
