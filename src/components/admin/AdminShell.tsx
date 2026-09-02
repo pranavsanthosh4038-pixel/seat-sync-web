@@ -112,6 +112,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
         </div>
       </header>
       {children}
+      <AiChatWidget />
     </div>
   );
 }
