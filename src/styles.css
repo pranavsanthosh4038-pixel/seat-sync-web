@@ -230,7 +230,7 @@
 /* Typography scope for admin + auth surfaces */
 .admin-scope,
 .admin-scope * {
-  font-family: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif !important;
+  font-family: "DM Sans", ui-sans-serif, system-ui, -apple-system, sans-serif !important;
   letter-spacing: normal;
 }
 .admin-scope h1,
@@ -240,6 +240,146 @@
   font-weight: 700;
   letter-spacing: -0.02em;
 }
+
+/* ---- Admin design system (District-style) ---- */
+:root {
+  --admin-hover: #fff0f0;
+  --admin-active: #fff5f5;
+}
+.dark {
+  --admin-hover: #2a2a2a;
+  --admin-active: #2a2a2a;
+}
+
+@utility admin-card {
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.3s ease,
+    border-color 0.3s ease;
+}
+@utility admin-card-hover {
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  }
+}
+@utility admin-panel {
+  background-color: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+@utility admin-nav {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 40px;
+  padding: 0 16px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--foreground);
+  border-left: 3px solid transparent;
+  transition: background-color 0.15s ease, color 0.15s ease;
+  cursor: pointer;
+  &:hover {
+    background-color: var(--admin-hover);
+    color: var(--primary);
+  }
+}
+@utility admin-nav-active {
+  background-color: var(--admin-active);
+  color: var(--primary);
+  border-left-color: var(--primary);
+}
+@utility admin-section-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted-foreground);
+  padding: 16px 16px 4px;
+}
+@utility admin-badge {
+  display: inline-block;
+  border-radius: 4px;
+  padding: 3px 6px;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+@utility admin-btn {
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: 12px;
+  font-weight: 600;
+  border: 1px solid currentColor;
+  background: transparent;
+  transition: background-color 0.15s ease, color 0.15s ease;
+  &:disabled {
+    opacity: 0.4;
+  }
+}
+@utility admin-btn-green {
+  color: #2ecc71;
+  &:hover:not(:disabled) {
+    background-color: #2ecc71;
+    color: #fff;
+  }
+}
+@utility admin-btn-red {
+  color: #e23744;
+  &:hover:not(:disabled) {
+    background-color: #e23744;
+    color: #fff;
+  }
+}
+@utility admin-btn-grey {
+  color: #717171;
+  &:hover:not(:disabled) {
+    background-color: #717171;
+    color: #fff;
+  }
+}
+@utility admin-th {
+  background-color: var(--surface);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted-foreground);
+  font-weight: 600;
+  text-align: left;
+  padding: 10px 14px;
+}
+@utility admin-td {
+  padding: 12px 14px;
+  font-size: 13px;
+  border-top: 1px solid var(--border);
+}
+@utility admin-row {
+  transition: background-color 0.15s ease;
+  &:hover {
+    background-color: var(--admin-active);
+  }
+}
+
+@keyframes admin-pop {
+  from { transform: scale(0.85); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+@keyframes admin-drawer-in {
+  from { transform: translateX(24px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+@keyframes admin-bounce {
+  0%, 80%, 100% { transform: translateY(0); opacity: 0.5; }
+  40% { transform: translateY(-4px); opacity: 1; }
+}
+@keyframes seat-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.55; }
+}
+
 
 @keyframes pulse-amber {
   0%, 100% { opacity: 1; }
