@@ -9,11 +9,11 @@ export const Route = createFileRoute("/_authenticated/admin/activity")({
   component: ActivityPage,
 });
 
-const ACTION_COLORS: Record<string, string> = {
-  lock: "#ffcc00",
-  book: "#bf00ff",
-  release: "#00ff88",
-  waitlist_remove: "#ff2e5b",
+const ACTION_BADGE: Record<string, { bg: string; color: string }> = {
+  lock: { bg: "#FEF3E2", color: "#F39C12" },
+  book: { bg: "#EBF5FB", color: "#2980B9" },
+  release: { bg: "#E8F8F0", color: "#27AE60" },
+  waitlist_remove: { bg: "#FFF0F0", color: "#E23744" },
 };
 
 function ActivityPage() {
@@ -37,54 +37,54 @@ function ActivityPage() {
   }, [refetch]);
 
   return (
-    <div className="px-4 md:px-8 py-6">
-      <div className="mb-6">
-        <div className="font-mono text-[10px] uppercase tracking-widest text-neon-cyan/70">
-          Control Room
-        </div>
-        <h1 className="font-display text-2xl md:text-3xl glow-cyan mt-1">ACTIVITY LOG</h1>
-      </div>
+    <div className="px-4 py-6 md:px-8">
+      <h1 className="text-2xl font-bold text-foreground">Booking Logs</h1>
+      <p className="mb-5 mt-1 text-[13px] text-muted-foreground">
+        Every lock, booking and release performed by staff.
+      </p>
 
-      <div className="panel">
-        {data.length === 0 && (
-          <div className="p-6 text-center text-muted-foreground font-mono text-xs italic">
-            No activity yet
-          </div>
-        )}
-        <ul>
-          {data.map((a: any) => {
-            const color = ACTION_COLORS[a.action] ?? "#00f0ff";
-            return (
-              <li
-                key={a.id}
-                className="border-b border-neon-cyan/10 px-4 py-3 flex items-start gap-4 font-mono text-xs"
-              >
-                <span
-                  className="uppercase tracking-widest text-[10px] px-2 py-0.5 border shrink-0"
-                  style={{ color, borderColor: color }}
-                >
-                  {a.action}
-                </span>
-                <div className="flex-1 min-w-0">
-                  <div>
-                    {a.seat_id && (
-                      <span className="text-neon-cyan mr-3">SEAT {a.seat_id}</span>
-                    )}
-                    {a.target_phone && (
-                      <span className="text-foreground mr-3">→ {a.target_phone}</span>
-                    )}
-                    {a.show_id && (
-                      <span className="text-muted-foreground">show {a.show_id}</span>
-                    )}
-                  </div>
-                  <div className="text-[10px] text-muted-foreground uppercase tracking-widest mt-1">
-                    {a.actor_email ?? "unknown"} · {new Date(a.created_at).toLocaleString()}
-                  </div>
-                </div>
-              </li>
-            );
-          })}
-        </ul>
+      <div className="admin-panel overflow-x-auto bg-card">
+        <table className="w-full">
+          <thead>
+            <tr>
+              <th className="admin-th">Action</th>
+              <th className="admin-th">Seat</th>
+              <th className="admin-th">Target</th>
+              <th className="admin-th">Actor</th>
+              <th className="admin-th">Time</th>
+            </tr>
+          </thead>
+          <tbody>
+            {data.length === 0 && (
+              <tr>
+                <td colSpan={5} className="admin-td text-center text-muted-foreground">
+                  No activity yet
+                </td>
+              </tr>
+            )}
+            {data.map((a: any) => {
+              const badge = ACTION_BADGE[a.action] ?? { bg: "#F0F0F0", color: "#717171" };
+              return (
+                <tr key={a.id} className="admin-row">
+                  <td className="admin-td">
+                    <span
+                      className="admin-badge"
+                      style={{ background: badge.bg, color: badge.color }}
+                    >
+                      {a.action}
+                    </span>
+                  </td>
+                  <td className="admin-td font-semibold text-foreground">{a.seat_id ?? "—"}</td>
+                  <td className="admin-td text-foreground">{a.target_phone ?? "—"}</td>
+                  <td className="admin-td text-muted-foreground">{a.actor_email ?? "unknown"}</td>
+                  <td className="admin-td text-muted-foreground">
+                    {new Date(a.created_at).toLocaleString()}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
       </div>
     </div>
   );
