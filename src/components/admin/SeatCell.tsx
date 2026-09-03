@@ -26,56 +26,39 @@ export function SeatCell({ id, status, expiresAt, queueLength, selected, onClick
   const mm = String(Math.floor(secs / 60)).padStart(1, "0");
   const ss = String(secs % 60).padStart(2, "0");
 
-  let color = "#00ff88";
-  let bg = "rgba(0,255,136,0.12)";
-  let glow = "0 0 6px rgba(0,255,136,0.5)";
+  let bg = "#2ECC71";
   let animation: string | undefined;
 
   if (status === "locked") {
-    color = "#ffcc00";
-    bg = "rgba(255,204,0,0.15)";
-    glow = "0 0 10px rgba(255,204,0,0.7)";
-    animation = "pulse-amber 1.6s infinite";
-  } else if (status === "booked") {
-    color = "#bf00ff";
-    bg = "rgba(191,0,255,0.15)";
-    glow = "0 0 8px rgba(191,0,255,0.6)";
-  }
-
-  if (selected) {
-    color = "#00f0ff";
-    bg = "rgba(0,240,255,0.25)";
-    glow = "0 0 14px rgba(0,240,255,0.9), inset 0 0 6px rgba(0,240,255,0.4)";
-    animation = undefined;
+    bg = "#F39C12";
+    animation = "seat-pulse 1.8s ease-in-out infinite";
+  } else if (status === "booked" || status === "confirmed") {
+    bg = "#333333";
   }
 
   return (
     <button
       onClick={onClick}
-      className="relative aspect-square font-mono text-[8px] flex items-center justify-center transition-all"
+      className="relative flex aspect-square items-center justify-center text-[8px] font-semibold text-white transition-all"
       style={{
-        color,
         background: bg,
-        border: `1px solid ${color}`,
-        boxShadow: glow,
+        borderRadius: 4,
         animation,
+        outline: selected ? "2px solid #E23744" : "none",
+        outlineOffset: 1,
       }}
       title={`${id} · ${status}${queueLength ? ` · ${queueLength} waiting` : ""}`}
     >
       <span className="leading-none">{id}</span>
       {status === "locked" && remaining > 0 && (
-        <span className="absolute -bottom-0.5 right-0.5 text-[7px] leading-none">
+        <span className="absolute bottom-0 right-0.5 text-[7px] leading-none">
           {mm}:{ss}
         </span>
       )}
       {queueLength > 0 && (
         <span
-          className="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full flex items-center justify-center text-[8px] font-bold"
-          style={{
-            background: "#00f0ff",
-            color: "#000",
-            boxShadow: "0 0 6px #00f0ff",
-          }}
+          className="absolute -right-1 -top-1 flex h-3.5 w-3.5 items-center justify-center rounded-full text-[8px] font-bold text-white"
+          style={{ background: "#E23744" }}
         >
           {queueLength > 9 ? "9+" : queueLength}
         </span>
