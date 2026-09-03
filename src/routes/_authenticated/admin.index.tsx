@@ -2,6 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
+import { Armchair, CheckCircle2, Lock, Users } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { listShowsWithCounts } from "@/lib/admin.functions";
 import { DemoCancellationWidget } from "@/components/admin/DemoCancellationWidget";
@@ -10,23 +11,30 @@ export const Route = createFileRoute("/_authenticated/admin/")({
   component: DashboardPage,
 });
 
-function StatChip({ label, value, tone }: { label: string; value: number; tone: string }) {
+function StatCard({
+  label,
+  value,
+  color,
+  Icon,
+}: {
+  label: string;
+  value: number;
+  color: string;
+  Icon: typeof Armchair;
+}) {
   return (
-    <div
-      className="pastel-card px-4 py-3 min-w-[92px]"
-      style={{ borderTop: `3px solid ${tone}` }}
-    >
+    <div className="admin-card admin-card-hover flex items-center gap-4 p-5">
       <div
-        className="font-mono text-[9px] uppercase tracking-widest"
-        style={{ color: "#6b7a92" }}
+        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full"
+        style={{ background: "#FFF0F0", color }}
       >
-        {label}
+        <Icon size={18} />
       </div>
-      <div
-        className="text-xl font-semibold"
-        style={{ color: "#2a3547", fontFamily: "var(--font-display)" }}
-      >
-        {value}
+      <div>
+        <div className="text-[28px] font-bold leading-none" style={{ color }}>
+          {value}
+        </div>
+        <div className="mt-1 text-[13px] text-muted-foreground">{label}</div>
       </div>
     </div>
   );
@@ -56,75 +64,47 @@ function DashboardPage() {
   const shows = data?.shows ?? [];
 
   return (
-    <div className="px-4 md:px-8 py-8">
-      <div className="mb-6">
-        <div
-          className="font-mono text-[10px] uppercase tracking-widest"
-          style={{ color: "#6b7a92" }}
-        >
-          Control Room
-        </div>
-        <h1
-          className="text-2xl md:text-3xl mt-1"
-          style={{ color: "#2a3547", fontFamily: "var(--font-display)" }}
-        >
-          Show List
-        </h1>
+    <div className="px-4 py-6 md:px-8">
+      <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
+      <p className="mt-1 text-[13px] text-muted-foreground">
+        Live seat and waitlist overview across the venue.
+      </p>
+
+      <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <StatCard label="Total Seats" value={c?.total ?? 0} color="#717171" Icon={Armchair} />
+        <StatCard label="Available" value={c?.available ?? 0} color="#2ECC71" Icon={CheckCircle2} />
+        <StatCard label="Locked" value={c?.locked ?? 0} color="#F39C12" Icon={Lock} />
+        <StatCard label="Waitlist Entries" value={c?.waitlisted ?? 0} color="#E23744" Icon={Users} />
       </div>
 
-      <div className="flex gap-3 flex-wrap mb-6">
-        <StatChip label="Seats" value={c?.total ?? 0} tone="#87CEEB" />
-        <StatChip label="Available" value={c?.available ?? 0} tone="#90EE90" />
-        <StatChip label="Locked" value={c?.locked ?? 0} tone="#F0E68C" />
-        <StatChip label="Booked" value={c?.booked ?? 0} tone="#DDA0DD" />
-        <StatChip label="Waitlisted" value={c?.waitlisted ?? 0} tone="#FFB6C1" />
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-6 mb-6">
-        <div
-          className="pastel-surface px-4 py-3 font-mono text-[11px]"
-          style={{ color: "#4a5b74" }}
-        >
+      <div id="admin-controls" className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-[1fr_auto]">
+        <div className="admin-card p-4 text-[13px] text-muted-foreground">
           Note: this venue uses a shared seat pool — counts reflect the whole cinema.
         </div>
         <DemoCancellationWidget />
       </div>
 
+      <h2 className="mb-3 mt-8 text-lg font-bold text-foreground">Shows</h2>
       {isLoading ? (
-        <div className="font-mono text-sm" style={{ color: "#6b7a92" }}>Loading shows…</div>
+        <div className="text-[13px] text-muted-foreground">Loading shows…</div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {shows.map((s: any) => (
             <button
               key={s.id}
               onClick={() => navigate({ to: "/admin/shows/$showId", params: { showId: s.id } })}
-              className="pastel-card text-left overflow-hidden hover:-translate-y-0.5 transition-all"
+              className="admin-card admin-card-hover overflow-hidden text-left"
             >
-              <div className="h-24 relative" style={{ background: s.movie?.poster ?? "#dde6f2" }}>
-                <div
-                  className="absolute inset-0"
-                  style={{ background: "linear-gradient(180deg, transparent 30%, rgba(255,255,255,0.85) 100%)" }}
-                />
-                <div className="absolute bottom-2 left-3 right-3">
-                  <div
-                    className="text-sm font-semibold truncate"
-                    style={{ color: "#2a3547", fontFamily: "var(--font-display)" }}
-                  >
-                    {s.movie?.title ?? s.movie_slug}
-                  </div>
+              <div className="h-20" style={{ background: s.movie?.poster ?? "#F0F0F0" }} />
+              <div className="space-y-1 p-3">
+                <div className="truncate text-sm font-semibold text-foreground">
+                  {s.movie?.title ?? s.movie_slug}
                 </div>
-              </div>
-              <div className="p-3 space-y-1">
-                <div
-                  className="font-mono text-[10px] uppercase tracking-widest flex justify-between"
-                  style={{ color: "#6b7a92" }}
-                >
+                <div className="flex justify-between text-[12px] text-muted-foreground">
                   <span>{s.time}</span>
-                  <span style={{ color: "#a97a1a" }}>{s.screen}</span>
+                  <span>{s.screen}</span>
                 </div>
-                <div className="font-mono text-[10px] truncate" style={{ color: "#4a5b74" }}>
-                  {s.theatre}
-                </div>
+                <div className="truncate text-[12px] text-muted-foreground">{s.theatre}</div>
               </div>
             </button>
           ))}
