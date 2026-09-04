@@ -334,6 +334,22 @@
     color: #fff;
   }
 }
+@utility admin-btn-primary {
+  color: var(--primary-foreground);
+  background-color: var(--primary);
+  border-color: var(--primary);
+  &:hover:not(:disabled) {
+    opacity: 0.9;
+  }
+}
+@utility admin-btn-amber {
+  color: var(--seat-locked);
+  border-color: var(--seat-locked);
+  &:hover:not(:disabled) {
+    background-color: var(--seat-locked);
+    color: var(--primary-foreground);
+  }
+}
 @utility admin-btn-grey {
   color: #717171;
   &:hover:not(:disabled) {

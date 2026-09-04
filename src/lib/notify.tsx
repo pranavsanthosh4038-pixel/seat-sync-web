@@ -12,20 +12,13 @@ const DOT: Record<Kind, string> = {
 export function notify(kind: Kind, message: string) {
   toast.custom(
     () => (
-      <div
-        className="flex items-center gap-2.5 px-4 py-3 rounded-full bg-card border border-border text-sm font-medium text-foreground"
-        style={{
-          boxShadow: "0 6px 24px -8px rgba(0,0,0,0.25)",
-          animation: "toast-up 0.25s ease",
-        }}
-      >
+      <div className="flex items-center gap-2.5 rounded-full border border-border bg-card px-4 py-3 text-sm font-medium text-foreground shadow-lg animate-[toast-up_0.25s_ease]">
         <span
-          className="w-2 h-2 rounded-full shrink-0"
-          style={{ background: DOT[kind] }}
+          className={`h-2 w-2 shrink-0 rounded-full ${kind === "success" ? "bg-seat-available" : kind === "warning" ? "bg-seat-locked" : "bg-primary"}`}
         />
         {message}
       </div>
     ),
-    { duration: 3000 },
+    { duration: 3000, position: "bottom-center" },
   );
 }
