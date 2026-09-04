@@ -58,23 +58,16 @@ export function AiChatWidget() {
   return (
     <div className="fixed bottom-6 right-6 z-[1000] flex flex-col items-end gap-3">
       {open && (
-        <div
-          className="flex flex-col overflow-hidden rounded-xl border bg-card shadow-[0_18px_40px_-16px_rgba(0,0,0,0.35)]"
-          style={{
-            width: "min(360px, calc(100vw - 32px))",
-            height: "min(480px, calc(100vh - 140px))",
-            animation: "toast-up 0.18s ease-out",
-          }}
-        >
-          <div className="flex items-center justify-between gap-3 border-b px-4 py-3">
+        <div className="flex h-[480px] w-[360px] max-h-[calc(100vh-140px)] max-w-[calc(100vw-32px)] flex-col overflow-hidden rounded-xl border border-border bg-card shadow-xl animate-[toast-up_0.18s_ease-out]">
+          <div className="flex items-center justify-between gap-3 bg-primary px-4 py-3 text-primary-foreground">
             <div>
-              <div className="text-sm font-bold text-foreground">SeatSync AI</div>
-              <div className="text-[11px] text-muted-foreground">Ask me anything</div>
+              <div className="text-sm font-bold">SeatSync AI</div>
+              <div className="text-[11px] opacity-80">Ask me anything</div>
             </div>
             <button
               onClick={() => setOpen(false)}
               aria-label="Close chat"
-              className="rounded-full p-1.5 text-muted-foreground transition-colors hover:bg-secondary"
+              className="rounded-full p-1.5 transition-colors hover:bg-primary-foreground/15"
             >
               <X className="h-4 w-4" />
             </button>
@@ -87,7 +80,7 @@ export function AiChatWidget() {
                   className={
                     m.role === "user"
                       ? "max-w-[80%] whitespace-pre-wrap rounded-2xl bg-primary px-3.5 py-2 text-[13px] leading-relaxed text-primary-foreground"
-                      : "max-w-[85%] whitespace-pre-wrap rounded-2xl bg-secondary px-3.5 py-2 text-[13px] leading-relaxed text-foreground"
+                      : "max-w-[85%] whitespace-pre-wrap rounded-2xl bg-surface px-3.5 py-2 text-[13px] leading-relaxed text-foreground"
                   }
                 >
                   {m.content}
@@ -96,12 +89,12 @@ export function AiChatWidget() {
             ))}
             {loading && (
               <div className="flex justify-start">
-                <div className="flex items-center gap-1 rounded-2xl bg-secondary px-3.5 py-3">
+                <div className="flex items-center gap-1 rounded-2xl bg-surface px-3.5 py-3">
                   {[0, 1, 2].map((d) => (
                     <span
                       key={d}
                       className="h-1.5 w-1.5 rounded-full bg-muted-foreground"
-                      style={{ animation: `pulse-amber 1s ease-in-out ${d * 0.15}s infinite` }}
+                      style={{ animation: `admin-bounce 1s ease-in-out ${d * 0.15}s infinite` }}
                     />
                   ))}
                 </div>
@@ -139,7 +132,7 @@ export function AiChatWidget() {
       <button
         onClick={() => setOpen((o) => !o)}
         aria-label={open ? "Close SeatSync AI" : "Open SeatSync AI"}
-        className="flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-[0_10px_24px_-8px_rgba(226,55,68,0.7)] transition-transform hover:scale-105"
+         className="flex h-[52px] w-[52px] items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition-transform hover:scale-105"
       >
         {open ? <X className="h-6 w-6" /> : <MessageCircle className="h-6 w-6" />}
       </button>

@@ -26,39 +26,30 @@ export function SeatCell({ id, status, expiresAt, queueLength, selected, onClick
   const mm = String(Math.floor(secs / 60)).padStart(1, "0");
   const ss = String(secs % 60).padStart(2, "0");
 
-  let bg = "#2ECC71";
-  let animation: string | undefined;
-
-  if (status === "locked") {
-    bg = "#F39C12";
-    animation = "seat-pulse 1.8s ease-in-out infinite";
-  } else if (status === "booked" || status === "confirmed") {
-    bg = "#333333";
-  }
+  const statusClass =
+    status === "locked"
+      ? "bg-seat-locked animate-[seat-pulse_1.8s_ease-in-out_infinite]"
+      : status === "booked" || status === "confirmed"
+        ? "bg-foreground"
+        : "bg-seat-available";
 
   return (
     <button
       onClick={onClick}
-      className="relative flex aspect-square items-center justify-center text-[8px] font-semibold text-white transition-all"
-      style={{
-        background: bg,
-        borderRadius: 4,
-        animation,
-        outline: selected ? "2px solid #E23744" : "none",
-        outlineOffset: 1,
-      }}
+      className={`relative flex aspect-square items-center justify-center rounded-[4px] text-[8px] font-semibold text-primary-foreground transition-all ${statusClass} ${selected ? "ring-2 ring-primary ring-offset-1 ring-offset-background" : ""}`}
       title={`${id} · ${status}${queueLength ? ` · ${queueLength} waiting` : ""}`}
     >
       <span className="leading-none">{id}</span>
       {status === "locked" && remaining > 0 && (
-        <span className="absolute bottom-0 right-0.5 text-[7px] leading-none">
+        <span
+          className="absolute bottom-0 right-0.5 text-[7px] leading-none"
+        >
           {mm}:{ss}
         </span>
       )}
       {queueLength > 0 && (
         <span
-          className="absolute -right-1 -top-1 flex h-3.5 w-3.5 items-center justify-center rounded-full text-[8px] font-bold text-white"
-          style={{ background: "#E23744" }}
+          className="absolute -right-1 -top-1 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-primary text-[8px] font-bold text-primary-foreground"
         >
           {queueLength > 9 ? "9+" : queueLength}
         </span>

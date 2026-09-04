@@ -58,31 +58,17 @@ export function DemoCancellationWidget() {
   ).padStart(2, "0")}`;
 
   return (
-    <div className="pastel-card p-5 max-w-sm">
-      <div className="flex items-center justify-between mb-4">
-        <div
-          className="font-mono text-[11px] uppercase tracking-[0.25em]"
-          style={{ color: "#6b4d09" }}
-        >
-          Admin // Demo
-        </div>
-        <span
-          className="w-2.5 h-2.5 rounded-full"
-          style={{ background: "#f8cf6b", boxShadow: "0 0 8px #f8cf6b" }}
-        />
+    <div className="admin-card max-w-sm p-5">
+      <div className="mb-4 flex items-center justify-between">
+        <div className="text-sm font-semibold text-foreground">Manual seat controls</div>
+        <span className="h-2.5 w-2.5 rounded-full bg-seat-locked" />
       </div>
 
-      <label
-        className="font-mono text-[10px] uppercase tracking-widest block mb-1"
-        style={{ color: "#6b7a92" }}
-      >
-        Select seat
-      </label>
+      <label className="mb-1 block text-xs font-medium text-muted-foreground">Select seat</label>
       <select
         value={selectedId}
         onChange={(e) => setSelectedId(e.target.value)}
-        className="w-full mb-3 px-3 py-2 pastel-inset text-sm focus:outline-none"
-        style={{ color: "#2a3547" }}
+        className="mb-3 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground outline-none focus:ring-2 focus:ring-ring/30"
       >
         <option value="">— pick a seat —</option>
         {seats.map((s) => (
@@ -95,10 +81,7 @@ export function DemoCancellationWidget() {
 
       {lockedSeats.length > 0 && (
         <div className="mb-4">
-          <div
-            className="font-mono text-[10px] uppercase tracking-widest mb-1"
-            style={{ color: "#6b7a92" }}
-          >
+          <div className="mb-1 text-xs font-medium text-muted-foreground">
             Held by users ({lockedSeats.length})
           </div>
           <div className="flex flex-wrap gap-1.5">
@@ -106,11 +89,7 @@ export function DemoCancellationWidget() {
               <button
                 key={s.id}
                 onClick={() => setSelectedId(s.id)}
-                className="px-2 py-1 rounded-lg text-[11px] font-mono"
-                style={{
-                  background: s.id === selectedId ? "#f8cf6b" : "#fdf0cf",
-                  color: "#6b4d09",
-                }}
+                className={`admin-badge border border-seat-locked ${s.id === selectedId ? "bg-seat-locked text-primary-foreground" : "bg-seat-locked/15 text-seat-locked"}`}
                 title={s.locked_by ? `Locked by ${s.locked_by}` : "Locked"}
               >
                 {s.id}
@@ -123,7 +102,7 @@ export function DemoCancellationWidget() {
       <button
         disabled={!selected || isLocked || lockMut.isPending}
         onClick={() => lockMut.mutate()}
-        className="w-full py-2.5 mb-3 pastel-btn-amber font-mono text-xs uppercase tracking-[0.2em] disabled:opacity-40"
+        className="admin-btn admin-btn-amber mb-3 w-full py-2.5"
       >
         {isLocked ? `Locked · ${mmss}` : "Lock Seat (2 min)"}
       </button>
@@ -131,15 +110,12 @@ export function DemoCancellationWidget() {
       <button
         disabled={!selected || selected.status === "available" || releaseMut.isPending}
         onClick={() => releaseMut.mutate()}
-        className="w-full py-2.5 pastel-btn-green font-mono text-xs uppercase tracking-[0.2em] disabled:opacity-40"
+        className="admin-btn admin-btn-red w-full py-2.5"
       >
         {isLocked && selected?.locked_by ? "Force Release (user hold)" : "Release Seat Now"}
       </button>
 
-      <div
-        className="mt-4 font-mono text-[10px] uppercase tracking-widest text-center"
-        style={{ color: "#8a97ad" }}
-      >
+      <div className="mt-4 text-center text-xs text-muted-foreground">
         Manual override · notifies next in queue
       </div>
 
