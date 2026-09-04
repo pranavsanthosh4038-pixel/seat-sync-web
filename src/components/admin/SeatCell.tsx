@@ -41,7 +41,9 @@ export function SeatCell({ id, status, expiresAt, queueLength, selected, onClick
     >
       <span className="leading-none">{id}</span>
       {status === "locked" && remaining > 0 && (
+        <span
           className="absolute bottom-0 right-0.5 text-[7px] leading-none"
+        >
           {mm}:{ss}
         </span>
       )}
